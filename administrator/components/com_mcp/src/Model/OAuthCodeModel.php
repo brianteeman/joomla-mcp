@@ -26,7 +26,7 @@ class OAuthCodeModel extends BaseDatabaseModel
 	 * Override the legacy error handling behaviour.
 	 *
 	 * @var bool
-	 * @since __DEPLOY_VERSION__
+	 * @since  __DEPLOY_VERSION__
 	 *        To be removed in Joomla 7.0
 	 */
 	protected $useExceptions = true;
@@ -37,7 +37,7 @@ class OAuthCodeModel extends BaseDatabaseModel
 	 * @param   array  $data  The data to insert
 	 *
 	 * @return void
-	 * @since __DEPLOY_VERSION__
+	 * @since  __DEPLOY_VERSION__
 	 */
 	public function insertOAuthCode(array $data)
 	{
@@ -89,7 +89,7 @@ class OAuthCodeModel extends BaseDatabaseModel
 	 * @param   int  $uid
 	 *
 	 * @return void
-	 * @since version
+	 * @since  __DEPLOY_VERSION__
 	 */
 	public function removeAuthCode(int $uid): void
 	{
