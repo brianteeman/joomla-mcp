@@ -75,6 +75,39 @@ class McpModel extends AdminModel
     }
 
     /**
+     * Get user object by token
+     *
+     * @param   string  $token  The client token to search for
+     *
+     * @return  object|null  The MCP client object or null if not found
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    public function getUserByToken($token): ?object
+    {
+        if (empty($token)) {
+            return null;
+        }
+
+        $db    = $this->getDatabase();
+        $query = $db->getQuery(true);
+
+        $query->select('*')
+            ->from($db->quoteName('#__mcp'))
+            ->where($db->quoteName('client_token') . ' = ' . $db->quote($token))
+            ->where($db->quoteName('state') . ' = 1');
+
+        $db->setQuery($query);
+
+        try {
+            $result = $db->loadObject();
+            return $result ?: null;
+        } catch (\RuntimeException $e) {
+            return null;
+        }
+    }
+
+    /**
      * Method to allow derived classes to preprocess the form.
      */
     protected function preprocessForm(\Joomla\CMS\Form\Form $form, $data, $group = 'mcp')

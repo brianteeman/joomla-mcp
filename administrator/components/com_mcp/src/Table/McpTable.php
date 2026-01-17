@@ -5,7 +5,6 @@ namespace Joomla\Component\MCP\Administrator\Table;
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Application\ApplicationHelper;
-use Joomla\CMS\Date\DateFactoryInterface;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Table\Table;
 use Joomla\Database\DatabaseDriver;
@@ -93,6 +92,7 @@ class McpTable extends Table
     public function __construct(DatabaseDriver $db)
     {
         parent::__construct('#__mcp', 'id', $db);
+        $this->setColumnAlias('published', 'state');
         $this->setColumnAlias('published', 'state');
     }
 
@@ -198,4 +198,5 @@ class McpTable extends Table
 
         return parent::store($updateNulls);
     }
+
 }
