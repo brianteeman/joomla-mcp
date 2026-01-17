@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+
 /**
  * @package         Joomla.MCP
  * @subpackage      com_mcp
@@ -7,14 +8,15 @@
  * @license         GNU General Public License version 2 or later; see LICENSE.txt
  */
 
+declare(strict_types=1);
+
 namespace Joomla\Component\MCP\Api\Auth;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
-use Joomla\Component\MCP\Administrator\Model\McpModel;
-use Psr\Http\Message\ServerRequestInterface;
+use Mcp\Server\Transport\Http\HttpMessage;
 
 /**
  * OAuth service for MCP server authentication
@@ -23,8 +25,8 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class DemoAuthService implements AuthServiceInterface
 {
-	public function validateToken(string $token, ServerRequestInterface $request): ?TokenInfo
-	{
-		return new TokenInfo((int) $token);
-	}
+    public function validateToken(string $token, HttpMessage $request): ?TokenInfo
+    {
+        return new TokenInfo((int) $token);
+    }
 }

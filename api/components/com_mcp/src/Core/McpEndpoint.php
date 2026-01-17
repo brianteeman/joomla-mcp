@@ -18,13 +18,12 @@ namespace Joomla\Component\MCP\Api\Core;
 
 use Joomla\Component\MCP\Api\Auth\AuthServiceInterface;
 use Laminas\Diactoros\Response\JsonResponse;
-use Laminas\Diactoros\Response\TextResponse;
 use Mcp\Server\HttpServerRunner;
 use Mcp\Server\Server;
 use Mcp\Server\Transport\Http\FileSessionStore;
+use Mcp\Server\Transport\Http\HttpMessage;
 use Mcp\Server\Transport\Http\StandardPhpAdapter;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -66,13 +65,11 @@ class McpEndpoint
     /**
      * Invoke the endpoint
      *
-     * @param ServerRequestInterface $request Request object
-     *
-     * @return ResponseInterface  Response object
-     *
+     * @param HttpMessage $request
+     * @return ResponseInterface|null
      * @since  __DEPLOY_VERSION__
      */
-    public function __invoke(ServerRequestInterface $request): ResponseInterface
+    public function handle(HttpMessage $request): ?ResponseInterface
     {
         try {
             $headers = array_map(function ($values) {
@@ -136,9 +133,6 @@ class McpEndpoint
                 $sessionStore
             );
 
-            // Handle the request and capture output
-            ob_start();
-
             // Suppress warnings/notices from MCP SDK to prevent deprecation issues
             $oldErrorReporting = error_reporting(E_ERROR | E_PARSE);
 
@@ -150,17 +144,7 @@ class McpEndpoint
                 error_reporting($oldErrorReporting);
             }
 
-            $output = ob_get_clean();
-
-            // Get the status code set by the adapter
-            $statusCode = http_response_code() ?: 200;
-
-            // Try to decode as JSON, fall back to plain text
-            $decodedOutput = json_decode($output, true);
-
-            return $decodedOutput !== null
-                ? new JsonResponse($decodedOutput, $statusCode, [], JSON_FORCE_OBJECT)
-                : new TextResponse($output, $statusCode);
+            return null;
         } catch (\Throwable $e) {
             return new JsonResponse(json_encode([
                 'error'   => 'Internal Server Error',
@@ -216,21 +200,21 @@ class McpEndpoint
     /**
      * Extract token from request (Bearer header or query parameter)
      *
-     * @param ServerRequestInterface $request Request object
+     * @param HttpMessage $request Request object
      *
      * @return  string|null  Token string or null if not found
      * @since   __DEPLOY_VERSION__
      */
-    private function extractToken(ServerRequestInterface $request): ?string
+    private function extractToken(HttpMessage $request): ?string
     {
         // Try Authorization header first (preferred method)
-        $authHeader = $request->getHeaderLine('Authorization');
+        $authHeader = $request->getHeader('Authorization');
         if (!empty($authHeader) && preg_match('/Bearer\s+(.+)/', $authHeader, $matches)) {
             return $matches[1];
         }
 
         // Try HTTP_AUTHORIZATION from Apache environment (fallback for Apache)
-        $serverParams = $request->getServerParams();
+        $serverParams = $_SERVER();
         $httpAuth     = $serverParams['HTTP_AUTHORIZATION'] ?? '';
         if (!empty($httpAuth) && preg_match('/Bearer\s+(.+)/', $httpAuth, $matches)) {
             return $matches[1];
@@ -261,25 +245,25 @@ class McpEndpoint
     /**
      * Handle auth header test request
      *
-     * @param ServerRequestInterface $request Request object
+     * @param HttpMessage $request Request object
      *
      * @return ResponseInterface           Response object
      * @since  __DEPLOY_VERSION__
      */
-    private function handleAuthHeaderTest(ServerRequestInterface $request): ResponseInterface
+    private function handleAuthHeaderTest(HttpMessage $request): ResponseInterface
     {
         $headers            = [];
         $receivedAuthHeader = false;
 
         // Check all possible ways the Authorization header might arrive
-        $authHeader = $request->getHeaderLine('Authorization');
+        $authHeader = $request->getHeader('Authorization');
         if (!empty($authHeader)) {
             $headers['authorization'] = $authHeader;
             $receivedAuthHeader       = true;
         }
 
         // Check server params for HTTP_AUTHORIZATION
-        $serverParams = $request->getServerParams();
+        $serverParams = $_SERVER;
         if (isset($serverParams['HTTP_AUTHORIZATION'])) {
             $headers['http_authorization'] = $serverParams['HTTP_AUTHORIZATION'];
             $receivedAuthHeader            = true;

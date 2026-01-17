@@ -22,7 +22,7 @@ use Joomla\Component\MCP\Administrator\Event\InitialiseMCPServerEvent;
 use Joomla\Component\MCP\Api\Core\McpEndpoint;
 use Joomla\Component\MCP\Api\Core\ToolRegistry;
 use Laminas\Diactoros\Response\JsonResponse;
-use Laminas\Diactoros\ServerRequestFactory;
+use Mcp\Server\Transport\Http\HttpMessage;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -44,16 +44,17 @@ final class McpController extends BaseController
         $route = $this->input->getPath('route', '');
         $this->logger->debug("Handling request '$route'");
 
-        $request = ServerRequestFactory::fromGlobals();
-
         $toolRegistry = $this->collectHandlers();
         $authService  = $this->app->get('mcp.authService');
         $config       = ['logger' => $this->logger];
         $endpoint     = new McpEndpoint($toolRegistry, $authService, $config);
+        $request      = HttpMessage::fromGlobals();
 
-        $response = $endpoint($request);
+        $result = $endpoint->handle($request);
 
-        $this->sendResponse($response);
+        if ($result !== null) {
+            $this->sendResponse($result);
+        }
         $this->app->close();
     }
 
