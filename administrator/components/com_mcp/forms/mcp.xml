@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form addfieldprefix="Joomla\Component\MCP\Administrator\Field">
 	<fieldset name="details">
-
 		<field
 			name="id"
 			type="text"
@@ -89,11 +88,9 @@
 			filter="raw"
 			class="font-monospace"
 		/>
-
 	</fieldset>
 
 	<fieldset name="publish" label="COM_MCP_GROUP_LABEL_PUBLISHING_DETAILS">
-
 		<field
 			name="created"
 			type="calendar"
@@ -165,7 +162,6 @@
 		/>
 	</fieldset>
 
-
 	<fieldset name="custom">
 		<field
 			name="additional_json"
@@ -176,5 +172,4 @@
 			filter="raw"
 		/>
 	</fieldset>
-
 </form>
