@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * @package         Joomla.MCP
  * @subpackage      com_mcp
@@ -22,41 +24,58 @@ use Joomla\CMS\MVC\Model\BaseDatabaseModel;
  */
 class AccessTokenModel extends BaseDatabaseModel
 {
-	/**
-	 * Override the legacy error handling behaviour.
-	 *
-	 * @var bool
-	 * @since __DEPLOY_VERSION__
-	 *        To be removed in Joomla 7.0
-	 */
-	protected $useExceptions = true;
+    /**
+     * Override the legacy error handling behaviour.
+     *
+     * @var bool
+     * @since __DEPLOY_VERSION__
+     *        To be removed in Joomla 7.0
+     */
+    protected $useExceptions = true;
 
-	/**
-	 * Store an access token in the database
-	 *
-	 * @param   array  $data
-	 *
-	 * @return void
-	 * @since __DEPLOY_VERSION__
-	 */
-	public function storeAccessToken(array $data): void
-	{
-		$db = $this->getDatabase();
-		$time   = time();
-		$object = (object) [
-			'pid'          => $data['pid'] ?? 0,
-			'tstamp'       => $data['tstamp'] ?? $time,
-			'crdate'       => $data['crdate'] ?? $time,
-			'token'        => $data['token'],
-			'userid'       => $data['userid'],
-			'client_name'  => $data['client_name'],
-			'expires'      => $data['expires'],
-			'last_used'    => $data['last_used'],
-			'created_ip'   => $data['created_ip'],
-			'last_used_ip' => $data['last_used_ip'],
-		];
-		if (!$db->insertObject('#__mcp_access_tokens', $object)) {
-			throw new \RuntimeException('Failed to insert access token');
-		}
-	}
+    /**
+     * Store an access token in the database
+     *
+     * @param   array  $data
+     *
+     * @return void
+     * @since __DEPLOY_VERSION__
+     */
+    public function storeAccessToken(array $data): void
+    {
+        $db     = $this->getDatabase();
+        $time   = time();
+        $object = (object) [
+            'pid'          => $data['pid'] ?? 0,
+            'tstamp'       => $data['tstamp'] ?? $time,
+            'crdate'       => $data['crdate'] ?? $time,
+            'token'        => $data['token'],
+            'userid'       => $data['userid'],
+            'client_name'  => $data['client_name'],
+            'expires'      => $data['expires'],
+            'last_used'    => $data['last_used'],
+            'created_ip'   => $data['created_ip'],
+            'last_used_ip' => $data['last_used_ip'],
+        ];
+        if (!$db->insertObject('#__mcp_access_tokens', $object)) {
+            throw new \RuntimeException('Failed to insert access token');
+        }
+    }
+
+    /**
+     * Get an access token from the database by token
+     *
+     * @param string $token  The token to look up
+     * @return array|null  The access token data or null if not found
+     * @since __DEPLOY_VERSION__
+     */
+    public function getByToken(string $token): ?array
+    {
+        $db    = $this->getDatabase();
+        $query = $db->createQuery();
+        $query->select('*')
+            ->from('#__mcp_access_tokens')
+            ->where('token = ' . $db->quote($token));
+        return $db->setQuery($query)->loadAssoc();
+    }
 }
