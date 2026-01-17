@@ -37,14 +37,6 @@ HTMLHelper::_('behavior.keepalive');
                 </div>
                 <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-                <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'custom', Text::_('COM_MCP_FIELD_ADDITIONAL_JSON_LABEL')); ?>
-                <div class="row">
-                    <div class="col-md-12">
-                        <?php echo $this->form->renderFieldset('custom'); ?>
-                    </div>
-                </div>
-                <?php echo HTMLHelper::_('uitab.endTab'); ?>
-
                 <?php echo HTMLHelper::_('uitab.endTabSet'); ?>
             </div>
 

@@ -15,17 +15,10 @@ class HtmlView extends BaseHtmlView
 
     public function display($tpl = null)
     {
-        //$this->form = $this->get('Form');
-        //$this->item = $this->get('Item');
-
         $model       = $this->getModel();
         $this->form  = $model->getForm();
         $this->item  = $model->getItem();
         $this->state = $model->getState();
-        // Validierung: Falls das Model kein Formular liefert
-        if (count($errors = $this->get('Errors'))) {
-            throw new \Exception(implode("\n", $errors), 500);
-        }
 
         $this->addToolbar();
 
