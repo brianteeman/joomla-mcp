@@ -158,7 +158,9 @@ class McpEndpoint
             // Try to decode as JSON, fall back to plain text
             $decodedOutput = json_decode($output, true);
 
-            return $decodedOutput !== null ? new JsonResponse($decodedOutput, $statusCode) : new TextResponse($output, $statusCode);
+            return $decodedOutput !== null
+                ? new JsonResponse($decodedOutput, $statusCode, [], JSON_FORCE_OBJECT)
+                : new TextResponse($output, $statusCode);
         } catch (\Throwable $e) {
             return new JsonResponse(json_encode([
                 'error'   => 'Internal Server Error',
