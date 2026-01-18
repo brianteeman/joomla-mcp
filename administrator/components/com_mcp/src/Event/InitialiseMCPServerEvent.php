@@ -16,21 +16,24 @@ namespace Joomla\Component\MCP\Administrator\Event;
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
-use Joomla\Component\MCP\Api\Core\ToolRegistry;
+use Joomla\Component\MCP\Api\Core\AbilityRegistry;
+use Joomla\Component\MCP\Api\Prompt\PromptInterface;
+use Joomla\Component\MCP\Api\Resource\ResourceInterface;
+use Joomla\Component\MCP\Api\Resource\ResourceTemplateInterface;
 use Joomla\Component\MCP\Api\Tool\ToolInterface;
 use Joomla\Event\Event;
 
 class InitialiseMCPServerEvent extends Event
 {
-    public function __construct(ToolRegistry $tools)
+    public function __construct(AbilityRegistry $abilities)
     {
-        $arguments['tools'] = $tools;
+        $arguments['abilities'] = $abilities;
 
         parent::__construct('initialiseMCPServerEvent', $arguments);
     }
 
-    public function addTool(ToolInterface $tool): void
+    public function addAbility(ResourceInterface|ResourceTemplateInterface|ToolInterface|PromptInterface $ability): void
     {
-        $this->arguments['tools']->addTool($tool);
+        $this->arguments['abilities']->addAbility($ability);
     }
 }

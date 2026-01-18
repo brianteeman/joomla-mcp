@@ -3,11 +3,9 @@
 namespace Joomla\Plugin\Mcp\Joomla\Tool;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Version;
 use Joomla\Component\MCP\Api\Tool\ToolInterface;
 use Mcp\Types\CallToolResult;
 use Mcp\Types\TextContent;
-use Symfony\Component\Console\Command\Command;
 
 class PurgeCache implements ToolInterface
 {

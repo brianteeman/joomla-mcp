@@ -20,7 +20,7 @@ use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\Component\MCP\Administrator\Event\InitialiseMCPServerEvent;
 use Joomla\Component\MCP\Api\Core\McpEndpoint;
-use Joomla\Component\MCP\Api\Core\ToolRegistry;
+use Joomla\Component\MCP\Api\Core\AbilityRegistry;
 use Laminas\Diactoros\Response\JsonResponse;
 use Mcp\Server\Transport\Http\HttpMessage;
 use Psr\Http\Message\ResponseInterface;
@@ -44,7 +44,7 @@ final class McpController extends BaseController
         $route = $this->input->getPath('route', '');
         $this->logger->debug("Handling request '$route'");
 
-        $toolRegistry = $this->collectHandlers();
+        $toolRegistry = $this->collectAbilities();
         $authService  = $this->app->get('mcp.authService');
         $config       = ['logger' => $this->logger];
         $endpoint     = new McpEndpoint($toolRegistry, $authService, $config);
@@ -95,17 +95,17 @@ final class McpController extends BaseController
     /**
      * Collect the available tools, resources and prompts
      *
-     * @return ToolRegistry
+     * @return AbilityRegistry
      * @since  __DEPLOY_VERSION__
      */
-    private function collectHandlers(): ToolRegistry
+    private function collectAbilities(): AbilityRegistry
     {
-        $tools = new ToolRegistry([]);
+        $abilities = new AbilityRegistry();
 
         PluginHelper::importPlugin('mcp');
-        $event = new InitialiseMCPServerEvent($tools);
+        $event = new InitialiseMCPServerEvent($abilities);
         $this->getDispatcher()->dispatch($event->getName(), $event);
 
-        return $tools;
+        return $abilities;
     }
 }

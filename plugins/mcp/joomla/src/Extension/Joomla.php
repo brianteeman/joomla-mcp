@@ -6,18 +6,20 @@ use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\Component\MCP\Administrator\Event\InitialiseMCPServerEvent;
 use Joomla\Event\SubscriberInterface;
 use Joomla\Plugin\Mcp\Joomla\Tool\PurgeCache;
+use Joomla\Plugin\Mcp\Joomla\Resource\SysInfo;
 
 final class Joomla extends CMSPlugin implements SubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
         return [
-            'initialiseMCPServerEvent' => 'registerTools'
+            'initialiseMCPServerEvent' => 'registerAbilities'
         ];
     }
 
-    public function registerTools(InitialiseMCPServerEvent $event): void
+    public function registerAbilities(InitialiseMCPServerEvent $event): void
     {
-        $event->addTool(new PurgeCache());
+        $event->addAbility(new PurgeCache());
+        $event->addAbility(new SysInfo());
     }
 }

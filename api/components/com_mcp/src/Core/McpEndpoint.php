@@ -46,8 +46,8 @@ class McpEndpoint
     /**
      * Constructor.
      *
-     * @param ToolRegistry $toolRegistry Tool registry
-     * @param array $config Configuration. Possible keys:
+     * @param AbilityRegistry $abilityRegistry Tool registry
+     * @param array           $config          Configuration. Possible keys:
      *                        - logger: Logger instance, defaults to NullLogger
      *                        - server_name: Server name, defaults to 'Joomla MCP Server'
      *                        - session_timeout: Session timeout in seconds, defaults to 1800
@@ -59,7 +59,7 @@ class McpEndpoint
      * @since  __DEPLOY_VERSION__
      */
     public function __construct(
-        private readonly ToolRegistry $toolRegistry,
+        private readonly AbilityRegistry $abilityRegistry,
         private readonly AuthServiceInterface $authService,
         private readonly array $config = []
     ) {
@@ -113,7 +113,7 @@ class McpEndpoint
             $server = new Server($this->config['server_name'] ?? 'Joomla MCP Server');
 
             // Register handlers
-            $this->registerHandlers($server, $this->toolRegistry);
+            $this->registerAbilities($server, $this->abilityRegistry);
 
             // Configure HTTP options
             $httpOptions = [
@@ -159,20 +159,20 @@ class McpEndpoint
     /**
      * Register MCP handlers
      *
-     * @param Server $server Server instance
-     * @param ToolRegistry $toolRegistry Tool registry
+     * @param Server          $server          Server instance
+     * @param AbilityRegistry $abilityRegistry Tool registry
      *
      * @return  void
      *
      * @since   __DEPLOY_VERSION__
      */
-    private function registerHandlers(Server $server, ToolRegistry $toolRegistry): void
+    private function registerAbilities(Server $server, AbilityRegistry $abilityRegistry): void
     {
         // Register tool/list handler
-        $server->registerHandler('tools/list', function () use ($toolRegistry) {
+        $server->registerHandler('tools/list', function () use ($abilityRegistry) {
             $tools = [];
 
-            foreach ($toolRegistry->getTools() as $tool) {
+            foreach ($abilityRegistry->getTools() as $tool) {
                 $schema = $tool->getSchema();
 
                 $toolDefinition = [
@@ -187,16 +187,45 @@ class McpEndpoint
         });
 
         // Register tool/call handler
-        $server->registerHandler('tools/call', function ($params) use ($toolRegistry) {
+        $server->registerHandler('tools/call', function ($params) use ($abilityRegistry) {
             $toolName  = $params->name;
             $arguments = $params->arguments;
 
-            $tool = $toolRegistry->getTool($toolName);
+            $tool = $abilityRegistry->getTool($toolName);
+
             if (!$tool) {
-                throw new \InvalidArgumentException('Tool not found: ' . $toolName);
+                throw new \InvalidArgumentException('Tool not found: ' . $toolName, 404);
             }
 
             return $tool->execute($arguments);
+        });
+
+        // Register resources/list handler
+        $server->registerHandler('resources/list', function () use ($abilityRegistry) {
+            $resources = [];
+
+            foreach ($abilityRegistry->getResources() as $resource) {
+                $resources[] = [
+                    "uri" => $resource->getUri(),
+                    "name" => $resource->getName(),
+                    "title" => $resource->getTitle(),
+                    "description" => $resource->getDescription()
+                ];
+            }
+
+            return ['resources' => $resources];
+        });
+
+
+        // Register resources/read handler
+        $server->registerHandler('resources/read', function ($params) use ($abilityRegistry) {
+            $resource = $abilityRegistry->getResource($params->uri);
+
+            if (!$resource) {
+                throw new \InvalidArgumentException('Resource not found: ' . $params->uri, 404);
+            }
+
+            return $resource->read();
         });
     }
 
