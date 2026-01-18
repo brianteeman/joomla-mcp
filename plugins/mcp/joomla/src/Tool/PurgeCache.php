@@ -3,6 +3,7 @@
 namespace Joomla\Plugin\Mcp\Joomla\Tool;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 use Joomla\Component\MCP\Api\Tool\ToolInterface;
 use Mcp\Types\CallToolResult;
 use Mcp\Types\TextContent;
@@ -12,7 +13,7 @@ class PurgeCache implements ToolInterface
 
     public function getName(): string
     {
-        return 'purgeCache';
+        return Text::_('PLG_MCP_JOOMLA_PURGECACHE_NAME');
     }
 
     public function getSchema(): array
@@ -36,7 +37,7 @@ class PurgeCache implements ToolInterface
             if (!$mCache->clean($cache->group)) {
                 return new CallToolResult(
                     [
-                        new TextContent("Could not clear cache for group " . $cache->group)
+                        new TextContent(Text::sprintf('PLG_MCP_JOOMLA_PURGECACHE_ERROR', $cache->group))
                     ],
                     true
                 );
@@ -45,7 +46,7 @@ class PurgeCache implements ToolInterface
 
         return new CallToolResult(
             [
-                new TextContent("Cache Purged successfully")
+                new TextContent(Text::_('PLG_MCP_JOOMLA_PURGECACHE_SUCCESS'))
             ]
         );
     }

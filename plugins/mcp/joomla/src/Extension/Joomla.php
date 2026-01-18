@@ -19,6 +19,9 @@ final class Joomla extends CMSPlugin implements SubscriberInterface
 
     public function registerAbilities(InitialiseMCPServerEvent $event): void
     {
+        // Load plugin language files for MCP API context
+        $this->loadLanguage();
+
         $event->addAbility(new PurgeCache());
         $event->addAbility(new SysInfo());
     }

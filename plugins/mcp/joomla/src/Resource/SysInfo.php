@@ -2,6 +2,7 @@
 
 namespace Joomla\Plugin\Mcp\Joomla\Resource;
 
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\Version;
 use Joomla\Component\MCP\Api\Resource\ResourceInterface;
 use Mcp\Types\ReadResourceRequest;
@@ -13,7 +14,7 @@ class SysInfo implements ResourceInterface
 
     public function getName(): string
     {
-        return "sysInfo";
+        return Text::_('PLG_MCP_JOOMLA_SYSINFO_NAME');
     }
 
     public function getUri(): string
@@ -23,12 +24,12 @@ class SysInfo implements ResourceInterface
 
     public function getDescription(): string
     {
-        return "Shows Joomla System Information";
+        return Text::_('PLG_MCP_JOOMLA_SYSINFO_DESC');
     }
 
     public function getTitle(): string
     {
-        return "Get System Information";
+        return Text::_('PLG_MCP_JOOMLA_SYSINFO_TITLE');
     }
 
     public function getMimeType(): string
@@ -39,9 +40,9 @@ class SysInfo implements ResourceInterface
     public function read(): ReadResourceResult
     {
         $info = [
-            "Server Time: " . date('Y-m-d H:i:s'),
-            "PHP Version: " . PHP_VERSION,
-            "Joomla Version: " . (new Version())->getLongVersion()
+            Text::sprintf('PLG_MCP_JOOMLA_SYSINFO_SERVER_TIME', date('Y-m-d H:i:s')),
+            Text::sprintf('PLG_MCP_JOOMLA_SYSINFO_PHP_VERSION', PHP_VERSION),
+            Text::sprintf('PLG_MCP_JOOMLA_SYSINFO_JOOMLA_VERSION', (new Version())->getLongVersion())
         ];
 
         return new ReadResourceResult(
