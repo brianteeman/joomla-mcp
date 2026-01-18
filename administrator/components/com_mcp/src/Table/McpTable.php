@@ -26,7 +26,7 @@ class McpTable extends Table implements VersionableTableInterface
      * @var    boolean
      * @since  __DEPLOY_VERSION__
      */
-    protected $_supportNullValue = true;
+    protected $_supportNullValue = false;
     /**
      * @var int
      */
@@ -224,7 +224,7 @@ class McpTable extends Table implements VersionableTableInterface
     /**
      * Method to store a node in the database table.
      */
-    public function store($updateNulls = false)
+    public function store($updateNulls = true)
     {
         $date = Factory::getDate()->toSql();
 
@@ -238,7 +238,6 @@ class McpTable extends Table implements VersionableTableInterface
                 $this->version++;
             }
         }
-
         return parent::store($updateNulls);
     }
 
