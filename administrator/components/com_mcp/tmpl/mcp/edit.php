@@ -7,7 +7,7 @@
  * @license         GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-defined('_JEXEC') or die;
+\defined('_JEXEC') or die;
 
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -15,7 +15,6 @@ use Joomla\CMS\Router\Route;
 
 /** @var \Joomla\Component\MCP\Administrator\View\Mcp\HtmlView $this */
 
-// Validierung und Verhaltensweisen laden
 HTMLHelper::_('behavior.formvalidator');
 HTMLHelper::_('behavior.keepalive');
 
