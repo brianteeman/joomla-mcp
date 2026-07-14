@@ -39,7 +39,7 @@ final class WebserviceTool implements ToolInterface
     public function getSchema(): array
     {
         $schema = [
-            'title' => $this->operation->title,
+            'title'       => $this->operation->title,
             'description' => $this->operation->description,
             'inputSchema' => $this->operation->inputSchema,
             'annotations' => $this->operation->annotations,
@@ -55,7 +55,7 @@ final class WebserviceTool implements ToolInterface
     public function execute(array $params): CallToolResult
     {
         $result = $this->invoker->invoke($this->operation, $params);
-        $text = $this->formatBody($result->body, $result->statusCode);
+        $text   = $this->formatBody($result->body, $result->statusCode);
 
         return new CallToolResult(
             [new TextContent($text)],
@@ -68,7 +68,7 @@ final class WebserviceTool implements ToolInterface
     private function formatBody(mixed $body, int $statusCode): string
     {
         if ($body === null || $body === '') {
-            return sprintf('%s completed with HTTP status %d.', $this->operation->operationId, $statusCode);
+            return \sprintf('%s completed with HTTP status %d.', $this->operation->operationId, $statusCode);
         }
 
         if (\is_string($body)) {
@@ -78,7 +78,7 @@ final class WebserviceTool implements ToolInterface
         $encoded = json_encode($body, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
         return $encoded === false
-            ? sprintf('%s returned an unserialisable response.', $this->operation->operationId)
+            ? \sprintf('%s returned an unserialisable response.', $this->operation->operationId)
             : $encoded;
     }
 }

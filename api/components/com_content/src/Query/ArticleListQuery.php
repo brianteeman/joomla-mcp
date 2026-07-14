@@ -19,17 +19,17 @@ use Joomla\CMS\WebService\Resource\Attribute\Property\Description;
  */
 final class ArticleListQuery
 {
-    public ?int $author = null;
-    public ?int $category = null;
-    public ?string $search = null;
-    public ?int $state = null;
-    public ?int $featured = null;
-    public ?int $tag = null;
-    public ?string $language = null;
+    public ?int $author                        = null;
+    public ?int $category                      = null;
+    public ?string $search                     = null;
+    public ?int $state                         = null;
+    public ?int $featured                      = null;
+    public ?int $tag                           = null;
+    public ?string $language                   = null;
     public ?\DateTimeImmutable $modified_start = null;
-    public ?\DateTimeImmutable $modified_end = null;
-    public ?int $checked_out = null;
-    public ?int $stage = null;
+    public ?\DateTimeImmutable $modified_end   = null;
+    public ?int $checked_out                   = null;
+    public ?int $stage                         = null;
 
     #[Description('The model field used to order the result set.')]
     public string $ordering = 'id';

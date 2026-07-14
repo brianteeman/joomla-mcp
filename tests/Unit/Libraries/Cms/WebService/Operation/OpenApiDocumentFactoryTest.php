@@ -12,7 +12,7 @@ final class OpenApiDocumentFactoryTest extends TestCase
     public function testArticleOperationsProjectToOpenApi(): void
     {
         $operations = (new OperationCompiler())->compile(ArticlesController::class);
-        $document = (new OpenApiDocumentFactory())->create($operations);
+        $document   = (new OpenApiDocumentFactory())->create($operations);
 
         self::assertSame('3.1.0', $document['openapi']);
         self::assertSame(

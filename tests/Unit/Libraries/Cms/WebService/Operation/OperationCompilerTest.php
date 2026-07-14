@@ -28,7 +28,7 @@ final class OperationCompilerTest extends TestCase
     public function testListOperationUsesJoomlaQueryStringConventions(): void
     {
         $operations = (new OperationCompiler())->compile(ArticlesController::class);
-        $list = $operations[0];
+        $list       = $operations[0];
 
         self::assertSame('author', $list->queryParameters['filter[author]']['argument']);
         self::assertSame('ordering', $list->queryParameters['list[ordering]']['argument']);
@@ -39,7 +39,7 @@ final class OperationCompilerTest extends TestCase
     public function testUpdateOperationCombinesIdentifierAndResourceProperties(): void
     {
         $operations = (new OperationCompiler())->compile(ArticlesController::class);
-        $update = $operations[3];
+        $update     = $operations[3];
 
         self::assertSame('PATCH', $update->method);
         self::assertSame('v1/content/articles/:id', $update->path);

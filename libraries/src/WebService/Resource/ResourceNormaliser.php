@@ -29,8 +29,7 @@ final class ResourceNormaliser
     public function normalise(
         ResourceInterface $resource,
         string $profile = ResourceProfile::READ,
-    ): array
-    {
+    ): array {
         $data = $resource instanceof Resource
             ? $this->normaliseValue($resource->getAdditionalProperties(), $profile)
             : [];

@@ -41,17 +41,17 @@ final class ResourceSchemaFactory
         $reflection = new \ReflectionClass($className);
         $isResource = $reflection->implementsInterface(ResourceInterface::class);
         $properties = [];
-        $required = [];
-        $defaults = $reflection->getDefaultProperties();
+        $required   = [];
+        $defaults   = $reflection->getDefaultProperties();
 
         foreach ($reflection->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
             if ($property->isStatic()) {
                 continue;
             }
 
-            $guarded = $this->firstAttribute($property, Guarded::class) !== null;
+            $guarded   = $this->firstAttribute($property, Guarded::class) !== null;
             $writeOnly = $this->firstAttribute($property, WriteOnly::class) !== null;
-            $hidden = $this->firstAttribute($property, Hidden::class);
+            $hidden    = $this->firstAttribute($property, Hidden::class);
 
             if ($hidden instanceof Hidden && $hidden->appliesTo($profile)) {
                 continue;
@@ -73,9 +73,9 @@ final class ResourceSchemaFactory
                 continue;
             }
 
-            $schema = $this->schemaForType($property->getType(), $property, $profile);
+            $schema      = $this->schemaForType($property->getType(), $property, $profile);
             $description = $this->firstAttribute($property, Description::class);
-            $example = $this->firstAttribute($property, Example::class);
+            $example     = $this->firstAttribute($property, Example::class);
 
             if ($description instanceof Description) {
                 $schema['description'] = $description->description;
@@ -85,7 +85,7 @@ final class ResourceSchemaFactory
                 $schema['example'] = $example->example;
             }
 
-            if (array_key_exists($property->getName(), $defaults)) {
+            if (\array_key_exists($property->getName(), $defaults)) {
                 $default = $defaults[$property->getName()];
 
                 if (\is_scalar($default) || $default === null || \is_array($default)) {
@@ -109,9 +109,9 @@ final class ResourceSchemaFactory
         }
 
         $schema = [
-            'type' => 'object',
+            'type'                 => 'object',
             'additionalProperties' => $this->allowsAdditionalProperties($reflection),
-            'properties' => $properties,
+            'properties'           => $properties,
         ];
 
         if ($required !== []) {
@@ -143,9 +143,9 @@ final class ResourceSchemaFactory
         }
 
         return match ($profile) {
-            ResourceProfile::CREATE => !$property->hasDefaultValue(),
+            ResourceProfile::CREATE                      => !$property->hasDefaultValue(),
             ResourceProfile::READ, ResourceProfile::LIST => !$this->allowsNull($property->getType()),
-            default => false,
+            default                                      => false,
         };
     }
 
@@ -193,17 +193,17 @@ final class ResourceSchemaFactory
 
         if ($type->isBuiltin()) {
             return match ($typeName) {
-                'int' => ['type' => 'integer'],
-                'float' => ['type' => 'number'],
-                'bool' => ['type' => 'boolean'],
+                'int'    => ['type' => 'integer'],
+                'float'  => ['type' => 'number'],
+                'bool'   => ['type' => 'boolean'],
                 'string' => ['type' => 'string'],
-                'array' => [
-                    'type' => 'array',
+                'array'  => [
+                    'type'  => 'array',
                     'items' => $this->arrayItemSchema($property, $profile),
                 ],
                 'object' => ['type' => 'object'],
-                'null' => ['type' => 'null'],
-                default => [],
+                'null'   => ['type' => 'null'],
+                default  => [],
             };
         }
 
@@ -256,7 +256,7 @@ final class ResourceSchemaFactory
     {
         return match ($type) {
             'integer', 'number', 'string', 'boolean', 'object' => ['type' => $type],
-            default => class_exists($type) ? $this->create($type, $profile) : [],
+            default                                            => class_exists($type) ? $this->create($type, $profile) : [],
         };
     }
 

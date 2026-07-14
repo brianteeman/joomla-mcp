@@ -26,8 +26,7 @@ abstract class Resource implements ResourceInterface
     public static function from(
         mixed $from,
         string $profile = ResourceProfile::READ,
-    ): ResourceInterface
-    {
+    ): ResourceInterface {
         if (\is_array($from)) {
             return static::fromArray($from, $profile);
         }
@@ -42,16 +41,14 @@ abstract class Resource implements ResourceInterface
     public static function fromArray(
         array $array,
         string $profile = ResourceProfile::READ,
-    ): ResourceInterface
-    {
+    ): ResourceInterface {
         return (new ResourceHydrator())->hydrate(static::class, $array, $profile);
     }
 
     public static function fromObject(
         object $object,
         string $profile = ResourceProfile::READ,
-    ): ResourceInterface
-    {
+    ): ResourceInterface {
         return static::fromArray(get_object_vars($object), $profile);
     }
 

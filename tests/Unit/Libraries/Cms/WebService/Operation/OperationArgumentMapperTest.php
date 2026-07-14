@@ -12,7 +12,7 @@ final class OperationArgumentMapperTest extends TestCase
     public function testUpdateArgumentsAreSplitIntoPathAndBody(): void
     {
         $operation = (new OperationCompiler())->compile(ArticlesController::class)[3];
-        $input = (new OperationArgumentMapper())->map(
+        $input     = (new OperationArgumentMapper())->map(
             $operation,
             ['id' => 7, 'title' => 'Changed title'],
         );
@@ -25,7 +25,7 @@ final class OperationArgumentMapperTest extends TestCase
     public function testListArgumentsUseJoomlaQueryParameterNames(): void
     {
         $operation = (new OperationCompiler())->compile(ArticlesController::class)[0];
-        $input = (new OperationArgumentMapper())->map(
+        $input     = (new OperationArgumentMapper())->map(
             $operation,
             ['author' => 42, 'ordering' => 'created'],
         );

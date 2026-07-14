@@ -35,12 +35,11 @@ final class ResourceHydrator
         string $resourceClass,
         array $data,
         string $profile = ResourceProfile::READ,
-    ): ResourceInterface
-    {
+    ): ResourceInterface {
         $reflection = new \ReflectionClass($resourceClass);
 
         if (!$reflection->implementsInterface(ResourceInterface::class)) {
-            throw new \InvalidArgumentException(sprintf('%s is not a web service resource.', $resourceClass));
+            throw new \InvalidArgumentException(\sprintf('%s is not a web service resource.', $resourceClass));
         }
 
         /** @var ResourceInterface $resource */
@@ -50,7 +49,7 @@ final class ResourceHydrator
             $this->unsetDeclaredDefaults($reflection, $resource);
         }
 
-        $additionalProperties = $reflection->getAttributes(AdditionalProperties::class);
+        $additionalProperties       = $reflection->getAttributes(AdditionalProperties::class);
         $allowsAdditionalProperties = $additionalProperties !== []
             && $additionalProperties[0]->newInstance()->allowed;
 
@@ -62,7 +61,7 @@ final class ResourceHydrator
                 }
 
                 throw new \InvalidArgumentException(
-                    sprintf('Property %s is not declared by %s.', $name, $resourceClass),
+                    \sprintf('Property %s is not declared by %s.', $name, $resourceClass),
                 );
             }
 
@@ -94,7 +93,7 @@ final class ResourceHydrator
 
         if ($hiddenAttributes !== [] && $hiddenAttributes[0]->newInstance()->appliesTo($profile)) {
             throw new \InvalidArgumentException(
-                sprintf('Property %s is not available in the %s profile.', $property->getName(), $profile),
+                \sprintf('Property %s is not available in the %s profile.', $property->getName(), $profile),
             );
         }
 
@@ -103,7 +102,7 @@ final class ResourceHydrator
             && $property->getAttributes(Guarded::class) !== []
         ) {
             throw new \InvalidArgumentException(
-                sprintf('Property %s is guarded and cannot be written.', $property->getName()),
+                \sprintf('Property %s is guarded and cannot be written.', $property->getName()),
             );
         }
 
@@ -112,7 +111,7 @@ final class ResourceHydrator
             && $property->getAttributes(WriteOnly::class) !== []
         ) {
             throw new \InvalidArgumentException(
-                sprintf('Property %s is write-only.', $property->getName()),
+                \sprintf('Property %s is write-only.', $property->getName()),
             );
         }
     }
