@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package     Joomla.Administrator
  * @subpackage  com_mcp
@@ -60,7 +61,6 @@ final readonly class ApiOperationDescriptor
         public array  $annotations,
         public bool   $exposeToMcp = false,
         public array  $tags = [],
-    )
-    {
+    ) {
     }
 }
