@@ -16,6 +16,6 @@ namespace Joomla\CMS\WebService\Resource\Attribute\Property;
  * @since  __DEPLOY_VERSION__
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final class Guarded
+class Guarded
 {
 }

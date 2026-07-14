@@ -16,7 +16,7 @@ namespace Joomla\CMS\WebService\Resource\Attribute\Property;
  * @since  __DEPLOY_VERSION__
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
-final readonly class Description
+class Description
 {
     public function __construct(public string $description)
     {
