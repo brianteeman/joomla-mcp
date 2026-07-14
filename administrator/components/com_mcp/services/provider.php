@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * @package         Joomla.MCP
  * @subpackage      com_mcp
@@ -19,8 +21,6 @@ use Joomla\CMS\Extension\Service\Provider\MVCFactory;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
-use Mcp\Server\Server;
-use Psr\Log\LoggerInterface;
 
 /**
  * The MCP service provider.
@@ -46,7 +46,7 @@ return new class () implements ServiceProviderInterface {
 
         $container->set(
             ComponentInterface::class,
-            function(Container $container) {
+            function (Container $container) {
                 $component = new MVCComponent($container->get(ComponentDispatcherFactoryInterface::class));
                 $component->setMVCFactory($container->get(MVCFactoryInterface::class));
 

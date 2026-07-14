@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * @package         Joomla.MCP
  * @subpackage      com_mcp
@@ -13,7 +15,6 @@ namespace Joomla\Component\MCP\Api\Auth;
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
-use Joomla\Component\MCP\Administrator\Model\McpModel;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -23,8 +24,8 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class DemoAuthService implements AuthServiceInterface
 {
-	public function validateToken(string $token, ServerRequestInterface $request): ?TokenInfo
-	{
-		return new TokenInfo((int) $token);
-	}
+    public function validateToken(string $token, ServerRequestInterface $request): ?TokenInfo
+    {
+        return new TokenInfo((int) $token);
+    }
 }

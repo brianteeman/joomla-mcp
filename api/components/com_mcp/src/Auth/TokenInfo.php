@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * @package         Joomla.MCP
  * @subpackage      com_mcp
@@ -15,7 +17,7 @@ namespace Joomla\Component\MCP\Api\Auth;
 
 class TokenInfo
 {
-	public function __construct(public readonly int $userId)
-	{
-	}
+    public function __construct(public readonly int $userId)
+    {
+    }
 }

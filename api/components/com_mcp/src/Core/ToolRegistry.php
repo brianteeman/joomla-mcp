@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * @package         Joomla.MCP
  * @subpackage      com_mcp
@@ -22,43 +24,43 @@ use Joomla\Component\MCP\Api\Tool\ToolInterface;
  */
 class ToolRegistry
 {
-	/**
-	 * @var ToolInterface[] Registered tools
-	 *
-	 * @since  __DEPLOY_VERSION__
-	 */
-	protected array $tools = [];
+    /**
+     * @var ToolInterface[] Registered tools
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    protected array $tools = [];
 
-	public function __construct(iterable $tools)
-	{
-		foreach ($tools as $tool) {
-			$this->tools[$tool->getName()] = $tool;
-		}
-	}
+    public function __construct(iterable $tools)
+    {
+        foreach ($tools as $tool) {
+            $this->tools[$tool->getName()] = $tool;
+        }
+    }
 
-	/**
-	 * Get all registered tools
-	 *
-	 * @return ToolInterface[]
-	 *
-	 * @since  __DEPLOY_VERSION__
-	 */
-	public function getTools(): array
-	{
-		return $this->tools;
-	}
+    /**
+     * Get all registered tools
+     *
+     * @return ToolInterface[]
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getTools(): array
+    {
+        return $this->tools;
+    }
 
-	/**
-	 * Get a specific tool by name
-	 *
-	 * @param string $name Tool name
-	 *
-	 * @return ToolInterface|null
-	 *
-	 * @since  __DEPLOY_VERSION__
-	 */
-	public function getTool(string $name): ?ToolInterface
-	{
-		return $this->tools[$name] ?? null;
-	}
+    /**
+     * Get a specific tool by name
+     *
+     * @param string $name Tool name
+     *
+     * @return ToolInterface|null
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    public function getTool(string $name): ?ToolInterface
+    {
+        return $this->tools[$name] ?? null;
+    }
 }

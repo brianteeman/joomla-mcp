@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * @package         Joomla.MCP
  * @subpackage      com_mcp
@@ -22,15 +24,15 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 interface AuthServiceInterface
 {
-	/**
-	 * Validate the given token
-	 *
-	 * @param   string                  $token
-	 * @param   ServerRequestInterface  $request
-	 *
-	 * @return TokenInfo|null The token information. Null if the token is invalid or expired.
-	 *
-	 * @since __DEPLOY_VERSION__
-	 */
-	public function validateToken(string $token, ServerRequestInterface $request): ?TokenInfo;
+    /**
+     * Validate the given token
+     *
+     * @param   string                  $token
+     * @param   ServerRequestInterface  $request
+     *
+     * @return TokenInfo|null The token information. Null if the token is invalid or expired.
+     *
+     * @since __DEPLOY_VERSION__
+     */
+    public function validateToken(string $token, ServerRequestInterface $request): ?TokenInfo;
 }
