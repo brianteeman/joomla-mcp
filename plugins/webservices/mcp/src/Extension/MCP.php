@@ -59,7 +59,7 @@ final class MCP extends CMSPlugin implements SubscriberInterface
         $defaults = [
             'component' => 'com_mcp',
             'public'    => true,
-            'format'    => ['application/json']
+            'format'    => ['application/json'],
         ];
 
         # This catch-all route MUST be the last one!
