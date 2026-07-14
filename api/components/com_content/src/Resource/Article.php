@@ -66,22 +66,22 @@ final class Article extends Resource
     #[Description('The category identifier.')]
     public int $category;
 
-    public array $images = [];
-    public string $metakey = '';
-    public string $metadesc = '';
-    public array $metadata = [];
-    public int $access = 1;
-    public int $featured = 0;
-    public string $alias = '';
-    public ?string $note = null;
-    public ?\DateTimeImmutable $publish_up = null;
+    public array $images                     = [];
+    public string $metakey                   = '';
+    public string $metadesc                  = '';
+    public array $metadata                   = [];
+    public int $access                       = 1;
+    public int $featured                     = 0;
+    public string $alias                     = '';
+    public ?string $note                     = null;
+    public ?\DateTimeImmutable $publish_up   = null;
     public ?\DateTimeImmutable $publish_down = null;
 
     #[Guarded]
     public \DateTimeImmutable $created;
 
     #[Description('The creating user identifier. A value of 0 uses the current user.')]
-    public int $created_by = 0;
+    public int $created_by          = 0;
     public string $created_by_alias = '';
 
     #[Guarded]
@@ -97,9 +97,9 @@ final class Article extends Resource
     #[Guarded]
     public int $version;
 
-    public ?\DateTimeImmutable $featured_up = null;
+    public ?\DateTimeImmutable $featured_up   = null;
     public ?\DateTimeImmutable $featured_down = null;
-    public array $urls = [];
+    public array $urls                        = [];
 
     #[Guarded]
     public ?array $schemaorg = null;

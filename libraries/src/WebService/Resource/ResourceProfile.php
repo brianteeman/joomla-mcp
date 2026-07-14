@@ -17,8 +17,8 @@ namespace Joomla\CMS\WebService\Resource;
  */
 final class ResourceProfile
 {
-    public const READ = 'read';
-    public const LIST = 'list';
+    public const READ   = 'read';
+    public const LIST   = 'list';
     public const CREATE = 'create';
     public const UPDATE = 'update';
 

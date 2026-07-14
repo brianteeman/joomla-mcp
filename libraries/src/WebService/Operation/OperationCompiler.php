@@ -44,20 +44,20 @@ final class OperationCompiler
 
         /** @var ResourceOperations $configuration */
         $configuration = $attributes[0]->newInstance();
-        $convention = $this->deriveConvention($reflection, $configuration);
+        $convention    = $this->deriveConvention($reflection, $configuration);
         $resourceClass = $convention['resourceClass'];
-        $queryClass = $convention['queryClass'];
-        $basePath = $convention['basePath'];
-        $controller = $convention['controller'];
-        $prefix = $convention['operationPrefix'];
-        $component = $convention['component'];
-        $tag = ucfirst($convention['collection']);
+        $queryClass    = $convention['queryClass'];
+        $basePath      = $convention['basePath'];
+        $controller    = $convention['controller'];
+        $prefix        = $convention['operationPrefix'];
+        $component     = $convention['component'];
+        $tag           = ucfirst($convention['collection']);
 
-        $readSchema = $this->schemaFactory->create($resourceClass, ResourceProfile::READ);
-        $listSchema = $this->schemaFactory->create($resourceClass, ResourceProfile::LIST);
+        $readSchema   = $this->schemaFactory->create($resourceClass, ResourceProfile::READ);
+        $listSchema   = $this->schemaFactory->create($resourceClass, ResourceProfile::LIST);
         $createSchema = $this->schemaFactory->create($resourceClass, ResourceProfile::CREATE);
         $updateSchema = $this->schemaFactory->create($resourceClass, ResourceProfile::UPDATE);
-        $querySchema = class_exists($queryClass)
+        $querySchema  = class_exists($queryClass)
             ? $this->schemaFactory->create($queryClass)
             : $this->emptyObjectSchema();
         $idSchema = ['type' => 'integer', 'minimum' => 1, 'description' => 'The resource identifier.'];
@@ -171,38 +171,38 @@ final class OperationCompiler
             $matches,
         )) {
             throw new \LogicException(
-                sprintf(
+                \sprintf(
                     'The controller namespace %s does not follow the Joomla API convention.',
                     $controller->getNamespaceName(),
                 ),
             );
         }
 
-        $componentName = $matches[1];
-        $component = strtolower($componentName);
+        $componentName  = $matches[1];
+        $component      = strtolower($componentName);
         $controllerName = preg_replace('/Controller$/', '', $controller->getShortName());
-        $collection = strtolower($controllerName);
-        $inflector = InflectorFactory::create()->build();
-        $resource = $inflector->singularize($controllerName);
-        $resourceClass = $configuration->resourceClass
-            ?? sprintf('Joomla\\Component\\%s\\Api\\Resource\\%s', $componentName, $resource);
-        $queryClass = sprintf('Joomla\\Component\\%s\\Api\\Query\\%sListQuery', $componentName, $resource);
+        $collection     = strtolower($controllerName);
+        $inflector      = InflectorFactory::create()->build();
+        $resource       = $inflector->singularize($controllerName);
+        $resourceClass  = $configuration->resourceClass
+            ?? \sprintf('Joomla\\Component\\%s\\Api\\Resource\\%s', $componentName, $resource);
+        $queryClass = \sprintf('Joomla\\Component\\%s\\Api\\Query\\%sListQuery', $componentName, $resource);
 
         if (!class_exists($resourceClass)) {
             throw new \LogicException(
-                sprintf('The convention-derived resource class %s does not exist.', $resourceClass),
+                \sprintf('The convention-derived resource class %s does not exist.', $resourceClass),
             );
         }
 
         return [
-            'component' => 'com_' . $component,
-            'collection' => $collection,
-            'resource' => strtolower($resource),
-            'resourceClass' => $resourceClass,
-            'queryClass' => $queryClass,
-            'basePath' => $configuration->basePath ?? sprintf('v1/%s/%s', $component, $collection),
-            'controller' => $configuration->controller ?? $collection,
-            'operationPrefix' => sprintf('%s.%s', $component, $collection),
+            'component'       => 'com_' . $component,
+            'collection'      => $collection,
+            'resource'        => strtolower($resource),
+            'resourceClass'   => $resourceClass,
+            'queryClass'      => $queryClass,
+            'basePath'        => $configuration->basePath ?? \sprintf('v1/%s/%s', $component, $collection),
+            'controller'      => $configuration->controller ?? $collection,
+            'operationPrefix' => \sprintf('%s.%s', $component, $collection),
         ];
     }
 
@@ -219,8 +219,8 @@ final class OperationCompiler
 
         foreach ($querySchema['properties'] ?? [] as $name => $schema) {
             $parameterName = \in_array($name, ['ordering', 'direction'], true)
-                ? sprintf('list[%s]', $name)
-                : sprintf('filter[%s]', $name);
+                ? \sprintf('list[%s]', $name)
+                : \sprintf('filter[%s]', $name);
 
             $parameters[$parameterName] = $this->parameter($name, $schema);
         }
@@ -244,9 +244,9 @@ final class OperationCompiler
     private function annotations(string $method): array
     {
         return [
-            'readOnlyHint' => \in_array($method, ['GET', 'HEAD', 'OPTIONS'], true),
+            'readOnlyHint'    => \in_array($method, ['GET', 'HEAD', 'OPTIONS'], true),
             'destructiveHint' => $method === 'DELETE',
-            'idempotentHint' => \in_array($method, ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE'], true),
+            'idempotentHint'  => \in_array($method, ['GET', 'HEAD', 'OPTIONS', 'PUT', 'DELETE'], true),
         ];
     }
 
@@ -259,9 +259,9 @@ final class OperationCompiler
     private function objectSchema(array $properties, array $required = []): array
     {
         $schema = [
-            'type' => 'object',
+            'type'                 => 'object',
             'additionalProperties' => false,
-            'properties' => $properties,
+            'properties'           => $properties,
         ];
 
         if ($required !== []) {

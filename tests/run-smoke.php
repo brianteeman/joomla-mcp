@@ -5,14 +5,14 @@
  */
 
 namespace {
-    define('_JEXEC', 1);
+    \define('_JEXEC', 1);
 
     spl_autoload_register(
         static function (string $class): void {
             $prefixes = [
-                'Joomla\\CMS\\WebService\\' => __DIR__ . '/../libraries/src/WebService/',
+                'Joomla\\CMS\\WebService\\'         => __DIR__ . '/../libraries/src/WebService/',
                 'Joomla\\Component\\Content\\Api\\' => __DIR__ . '/../api/components/com_content/src/',
-                'Joomla\\Component\\MCP\\Api\\' => __DIR__ . '/../api/components/com_mcp/src/',
+                'Joomla\\Component\\MCP\\Api\\'     => __DIR__ . '/../api/components/com_mcp/src/',
             ];
 
             foreach ($prefixes as $prefix => $directory) {
@@ -20,7 +20,7 @@ namespace {
                     continue;
                 }
 
-                $file = $directory . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php';
+                $file = $directory . str_replace('\\', '/', substr($class, \strlen($prefix))) . '.php';
 
                 if (is_file($file)) {
                     require $file;
@@ -55,7 +55,6 @@ namespace Joomla\CMS\MVC\Controller {
     {
     }
 }
-
 
 namespace Joomla\Router {
     final class Route
@@ -137,8 +136,8 @@ namespace {
     };
 
     $schemaFactory = new ResourceSchemaFactory();
-    $createSchema = $schemaFactory->create(Article::class, ResourceProfile::CREATE);
-    $updateSchema = $schemaFactory->create(Article::class, ResourceProfile::UPDATE);
+    $createSchema  = $schemaFactory->create(Article::class, ResourceProfile::CREATE);
+    $updateSchema  = $schemaFactory->create(Article::class, ResourceProfile::UPDATE);
 
     $assert($createSchema['required'] === ['title', 'category'], 'Unexpected create requirements.');
     $assert(!isset($createSchema['properties']['id']), 'Guarded ID leaked into the create schema.');
@@ -157,12 +156,12 @@ namespace {
         'An installation-specific property was not preserved.',
     );
     $normalisedPatch = $patch->toArray(ResourceProfile::UPDATE);
-    $assert(!array_key_exists('alias', $normalisedPatch), 'An omitted default leaked into PATCH output.');
-    $assert(array_key_exists('note', $normalisedPatch), 'Explicit null disappeared during normalisation.');
+    $assert(!\array_key_exists('alias', $normalisedPatch), 'An omitted default leaked into PATCH output.');
+    $assert(\array_key_exists('note', $normalisedPatch), 'Explicit null disappeared during normalisation.');
 
-    $compiler = new OperationCompiler($schemaFactory);
+    $compiler   = new OperationCompiler($schemaFactory);
     $operations = $compiler->compile(ArticlesController::class);
-    $assert(count($operations) === 5, 'The compiler did not create five CRUD operations.');
+    $assert(\count($operations) === 5, 'The compiler did not create five CRUD operations.');
     $assert($operations[3]->operationId === 'content.articles.update', 'Unexpected update operation ID.');
     $assert(
         $operations[0]->queryParameters['filter[author]']['argument'] === 'author',
@@ -181,8 +180,8 @@ namespace {
     $assert($mappedInput->body === ['title' => 'Changed title'], 'The request body mapping is incorrect.');
 
     $routeFactory = new RestRouteFactory();
-    $routes = array_map($routeFactory->create(...), $operations);
-    $assert(count($routes) === 5, 'The REST projection did not create five routes.');
+    $routes       = array_map($routeFactory->create(...), $operations);
+    $assert(\count($routes) === 5, 'The REST projection did not create five routes.');
     $assert($routes[3]->route === 'v1/content/articles/:id', 'The REST update route is incorrect.');
     $assert($routes[3]->controller === 'articles.edit', 'The REST update task is incorrect.');
 
@@ -208,7 +207,7 @@ namespace {
     $provider = new WebserviceToolProvider($compiler, $invoker);
     $provider->register($registry, ArticlesController::class);
 
-    $assert(count($registry->abilities) === 5, 'The provider did not register five MCP tools.');
+    $assert(\count($registry->abilities) === 5, 'The provider did not register five MCP tools.');
     $tool = $registry->abilities['content.articles.update'];
     $assert($tool->getName() === 'content.articles.update', 'Unexpected MCP tool name.');
     $assert(isset($tool->getSchema()['inputSchema']['properties']['title']), 'MCP input schema is incomplete.');
