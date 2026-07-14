@@ -20,6 +20,7 @@ use Joomla\CMS\WebService\Resource\Attribute\Property\Source;
 use Joomla\CMS\WebService\Resource\Attribute\Property\WriteOnly;
 use Joomla\CMS\WebService\Resource\Resource;
 use Joomla\CMS\WebService\Resource\ResourceProfile;
+use Joomla\Component\Content\Api\Resource\Enum\ArticleState;
 
 /**
  * Canonical article resource contract.
@@ -66,16 +67,16 @@ final class Article extends Resource
 
     #[Description('The publication state: 1 published, 0 unpublished, 2 archived or -2 trashed.')]
     #[Example(1)]
-    public int $state = 0;
+    public ArticleState $state;
 
     #[Description('The category identifier.')]
     #[Source('catid')]
     public int $category;
 
-    public array $images                     = [];
-    public string $metakey                   = '';
-    public string $metadesc                  = '';
-    public array $metadata                   = [];
+    public ArticleImage $images;
+    public string $metakey  = '';
+    public string $metadesc = '';
+    public ArticleMetadata $metadata;
     public int $access                       = 1;
     public int $featured                     = 0;
     public string $alias                     = '';
@@ -105,7 +106,7 @@ final class Article extends Resource
 
     public ?\DateTimeImmutable $featured_up   = null;
     public ?\DateTimeImmutable $featured_down = null;
-    public array $urls                        = [];
+    public ArticleUrls $urls;
 
     #[Guarded]
     public ?array $schemaorg = null;
