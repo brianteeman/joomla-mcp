@@ -14,7 +14,7 @@ use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\CMS\WebService\Operation\OperationCompiler;
 use Joomla\Component\Content\Api\Controller\ArticlesController;
 use Joomla\Component\MCP\Administrator\Event\InitialiseMCPServerEvent;
-use Joomla\Component\MCP\Api\Tool\HttpOperationInvoker;
+use Joomla\Component\MCP\Api\Tool\InternalApiOperationInvoker;
 use Joomla\Component\MCP\Api\Tool\WebserviceToolProvider;
 use Joomla\Event\SubscriberInterface;
 use Joomla\Plugin\Mcp\Joomla\Resource\ApplicationConfig;
@@ -45,7 +45,7 @@ final class Joomla extends CMSPlugin implements SubscriberInterface
 
         $provider = new WebserviceToolProvider(
             new OperationCompiler(),
-            new HttpOperationInvoker(),
+            new InternalApiOperationInvoker(),
         );
 
         foreach ($provider->getTools(ArticlesController::class) as $tool) {
