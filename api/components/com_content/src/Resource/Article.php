@@ -16,6 +16,7 @@ use Joomla\CMS\WebService\Resource\Attribute\Property\Example;
 use Joomla\CMS\WebService\Resource\Attribute\Property\Guarded;
 use Joomla\CMS\WebService\Resource\Attribute\Property\Hidden;
 use Joomla\CMS\WebService\Resource\Attribute\Property\Items;
+use Joomla\CMS\WebService\Resource\Attribute\Property\Optional;
 use Joomla\CMS\WebService\Resource\Attribute\Property\Required;
 use Joomla\CMS\WebService\Resource\Resource;
 use Joomla\CMS\WebService\Resource\ResourceProfile;
@@ -57,6 +58,7 @@ final class Article extends Resource
 
     #[Description('The publication state: 1 published, 0 unpublished, 2 archived or -2 trashed.')]
     #[Example(1)]
+    #[Optional([ResourceProfile::CREATE])]
     public ArticleState $state;
 
     #[Description('The category identifier for list and read endpoints.')]
@@ -68,9 +70,13 @@ final class Article extends Resource
     #[Hidden([ResourceProfile::CREATE, ResourceProfile::UPDATE])]
     public object $category;
 
+    #[Optional([ResourceProfile::CREATE])]
     public ArticleImage $images;
+
     public string $metakey  = '';
     public string $metadesc = '';
+
+    #[Optional([ResourceProfile::CREATE])]
     public ArticleMetadata $metadata;
     public int $access                       = 1;
     public int $featured                     = 0;
@@ -101,6 +107,8 @@ final class Article extends Resource
 
     public ?\DateTimeImmutable $featured_up   = null;
     public ?\DateTimeImmutable $featured_down = null;
+
+    #[Optional([ResourceProfile::CREATE])]
     public ArticleUrls $urls;
 
     #[Guarded]

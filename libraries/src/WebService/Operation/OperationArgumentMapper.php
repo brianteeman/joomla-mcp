@@ -44,13 +44,12 @@ final class OperationArgumentMapper
             }
         }
 
-        foreach ($operation->requestBodySchema['properties'] ?? [] as $name => $schema) {
+        foreach (array_keys($operation->requestBodySchema['properties'] ?? []) as $name) {
             if (!\array_key_exists($name, $arguments)) {
                 continue;
             }
 
-            $transportName        = $schema['x-joomla-source'] ?? $name;
-            $body[$transportName] = $arguments[$name];
+            $body[$name] = $arguments[$name];
         }
 
         return new OperationInput($path, $query, $body);

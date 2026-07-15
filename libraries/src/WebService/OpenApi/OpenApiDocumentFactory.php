@@ -75,7 +75,7 @@ final class OpenApiDocumentFactory
                 $definition['requestBody'] = [
                     'required' => true,
                     'content'  => [
-                        'application/json' => ['schema' => $this->transportSchema($operation->requestBodySchema)],
+                        'application/json' => ['schema' => $operation->requestBodySchema],
                     ],
                 ];
             }
@@ -86,53 +86,6 @@ final class OpenApiDocumentFactory
         ksort($document['paths']);
 
         return $document;
-    }
-
-    /**
-     * Converts canonical resource property names to established REST transport names.
-     *
-     * @param array<string, mixed> $schema
-     *
-     * @return array<string, mixed>
-     */
-    private function transportSchema(array $schema): array
-    {
-        if (isset($schema['items']) && \is_array($schema['items'])) {
-            $schema['items'] = $this->transportSchema($schema['items']);
-        }
-
-        if (!isset($schema['properties']) || !\is_array($schema['properties'])) {
-            unset($schema['x-joomla-source']);
-
-            return $schema;
-        }
-
-        $properties = [];
-        $nameMap    = [];
-
-        foreach ($schema['properties'] as $canonicalName => $propertySchema) {
-            $transportName = $propertySchema['x-joomla-source'] ?? $canonicalName;
-            unset($propertySchema['x-joomla-source']);
-            $propertySchema = $this->transportSchema($propertySchema);
-
-            if ($transportName !== $canonicalName) {
-                $propertySchema['x-joomla-argument'] = $canonicalName;
-            }
-
-            $properties[$transportName] = $propertySchema;
-            $nameMap[$canonicalName]    = $transportName;
-        }
-
-        $schema['properties'] = $properties;
-
-        if (isset($schema['required']) && \is_array($schema['required'])) {
-            $schema['required'] = array_map(
-                static fn (string $name): string => $nameMap[$name] ?? $name,
-                $schema['required'],
-            );
-        }
-
-        return $schema;
     }
 
     /**

@@ -13,11 +13,10 @@ final class ResourceSchemaFactoryTest extends TestCase
     {
         $schema = (new ResourceSchemaFactory())->create(Article::class, ResourceProfile::CREATE);
 
-        self::assertSame(['title', 'category'], $schema['required']);
+        self::assertSame(['title', 'text', 'catid'], $schema['required']);
         self::assertArrayNotHasKey('id', $schema['properties']);
         self::assertSame('*', $schema['properties']['language']['default']);
         self::assertSame('integer', $schema['properties']['tags']['items']['type']);
-        self::assertTrue($schema['properties']['introtext']['writeOnly']);
         self::assertTrue($schema['additionalProperties']);
     }
 
@@ -47,8 +46,21 @@ final class ResourceSchemaFactoryTest extends TestCase
         $schema = (new ResourceSchemaFactory())->create(Article::class, ResourceProfile::READ);
 
         self::assertTrue($schema['properties']['id']['readOnly']);
-        self::assertArrayNotHasKey('introtext', $schema['properties']);
         self::assertSame('object', $schema['properties']['tags']['items']['type']);
         self::assertSame('date-time', $schema['properties']['created']['format']);
+    }
+
+    public function testCategoryIsWrittenAsAnIdentifierAndReadAsAnObject(): void
+    {
+        $factory = new ResourceSchemaFactory();
+
+        $create = $factory->create(Article::class, ResourceProfile::CREATE)['properties'];
+        $read   = $factory->create(Article::class, ResourceProfile::READ)['properties'];
+
+        self::assertSame('integer', $create['catid']['type']);
+        self::assertArrayNotHasKey('category', $create);
+
+        self::assertSame('object', $read['category']['type']);
+        self::assertArrayNotHasKey('catid', $read);
     }
 }

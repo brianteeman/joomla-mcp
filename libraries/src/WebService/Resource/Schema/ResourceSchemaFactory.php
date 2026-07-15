@@ -18,7 +18,6 @@ use Joomla\CMS\WebService\Resource\Attribute\Property\Hidden;
 use Joomla\CMS\WebService\Resource\Attribute\Property\Items;
 use Joomla\CMS\WebService\Resource\Attribute\Property\Optional;
 use Joomla\CMS\WebService\Resource\Attribute\Property\Required;
-use Joomla\CMS\WebService\Resource\Attribute\Property\Source;
 use Joomla\CMS\WebService\Resource\Attribute\Property\WriteOnly;
 use Joomla\CMS\WebService\Resource\ResourceInterface;
 use Joomla\CMS\WebService\Resource\ResourceProfile;
@@ -77,7 +76,6 @@ final class ResourceSchemaFactory
             $schema      = $this->schemaForType($property->getType(), $property, $profile);
             $description = $this->firstAttribute($property, Description::class);
             $example     = $this->firstAttribute($property, Example::class);
-            $source      = $this->sourceForProfile($property, $profile);
 
             if ($description instanceof Description) {
                 $schema['description'] = $description->description;
@@ -85,10 +83,6 @@ final class ResourceSchemaFactory
 
             if ($example instanceof Example) {
                 $schema['example'] = $example->example;
-            }
-
-            if ($source instanceof Source && $source->name !== $property->getName()) {
-                $schema['x-joomla-source'] = $source->name;
             }
 
             if (\array_key_exists($property->getName(), $defaults)) {
@@ -276,20 +270,6 @@ final class ResourceSchemaFactory
     private function allowsNull(?\ReflectionType $type): bool
     {
         return $type?->allowsNull() ?? true;
-    }
-
-
-    private function sourceForProfile(\ReflectionProperty $property, string $profile): ?Source
-    {
-        foreach ($property->getAttributes(Source::class) as $attribute) {
-            $source = $attribute->newInstance();
-
-            if ($source->appliesTo($profile)) {
-                return $source;
-            }
-        }
-
-        return null;
     }
 
     private function firstAttribute(\ReflectionProperty $property, string $attributeClass): ?object

@@ -12,7 +12,7 @@ final class ResourceHydratorTest extends TestCase
     {
         /** @var Article $article */
         $article = Article::fromArray(
-            ['title' => 'Example', 'category' => 2],
+            ['title' => 'Example', 'catid' => 2],
             ResourceProfile::CREATE,
         );
 
