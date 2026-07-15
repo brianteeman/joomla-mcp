@@ -17,16 +17,13 @@ namespace Joomla\Component\Content\Api\Resource;
  */
 class ArticleUrls
 {
-    public function __construct(
-        public string $urla,
-        public string $urlatext,
-        public string $targeta,
-        public string $urlb,
-        public string $urlbtext,
-        public string $targetb,
-        public string $urlc,
-        public string $urlctext,
-        public string $targetc,
-    ) {
-    }
+    public string $urla;
+    public string $urlatext;
+    public string $targeta;
+    public string $urlb;
+    public string $urlbtext;
+    public string $targetb;
+    public string $urlc;
+    public string $urlctext;
+    public string $targetc;
 }

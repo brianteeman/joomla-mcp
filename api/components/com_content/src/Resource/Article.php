@@ -65,6 +65,7 @@ final class Article extends Resource
     #[Hidden([ResourceProfile::LIST, ResourceProfile::READ])]
     public int $catid;
 
+    # Folks, please, don't judge us: this has been legacy behavior of the webservices API
     #[Description('The category identifier for create and update endpoints.')]
     #[Guarded]
     #[Hidden([ResourceProfile::CREATE, ResourceProfile::UPDATE])]

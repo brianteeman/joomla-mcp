@@ -17,10 +17,7 @@ namespace Joomla\Component\Content\Api\Resource;
  */
 class ArticleMetadata
 {
-    public function __construct(
-        public string $robots,
-        public string $author,
-        public string $rights,
-    ) {
-    }
+    public string $robots;
+    public string $author;
+    public string $rights;
 }
