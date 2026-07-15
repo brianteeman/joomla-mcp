@@ -49,13 +49,8 @@ final class ComponentApiDispatcher implements InternalApiDispatcherInterface
             );
         }
 
-        $query                = $this->expandQueryParameters($input->query);
-        $source               = array_replace_recursive($input->body, $query, $input->path);
-        $source['data']       = $input->body;
-        $source['option']     = $component;
-        $source['controller'] = $operation->controller;
-        $source['task']       = $operation->controller . '.' . $operation->task;
-        $source['format']     = 'jsonapi';
+        $query  = $this->expandQueryParameters($input->query);
+        $source = $this->requestSource($operation, $input, $query, $component);
 
         $requestInput = new InternalApiInput($source, $input->body, $query, $operation->method);
         $application  = new InternalApiApplication($parent, $requestInput);
@@ -87,6 +82,36 @@ final class ComponentApiDispatcher implements InternalApiDispatcherInterface
         $body       = $this->responseBody($application, $output, $statusCode);
 
         return new InternalApiResponse($statusCode, $body, $headers, $mediaType);
+    }
+
+    /**
+     * Builds the request source an existing API controller expects.
+     *
+     * ApiRouter splits a "controller.task" route into both values before any dispatcher sees them, so a controller
+     * receives the task unprefixed. This mirrors that: BaseController::execute() looks the task up in its task map
+     * and silently falls back to __default, which is display(), when it does not match. That fallback renders a view
+     * without the content type and is not the task the operation asked for.
+     *
+     * @param array<string, mixed> $query
+     *
+     * @return array<string, mixed>
+     *
+     * @since  __DEPLOY_VERSION__
+     */
+    private function requestSource(
+        OperationDefinition $operation,
+        OperationInput $input,
+        array $query,
+        string $component,
+    ): array {
+        $source               = array_replace_recursive($input->body, $query, $input->path);
+        $source['data']       = $input->body;
+        $source['option']     = $component;
+        $source['controller'] = $operation->controller;
+        $source['task']       = $operation->task;
+        $source['format']     = 'jsonapi';
+
+        return $source;
     }
 
     /**
