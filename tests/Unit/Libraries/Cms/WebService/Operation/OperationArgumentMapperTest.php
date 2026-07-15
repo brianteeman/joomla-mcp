@@ -35,4 +35,58 @@ final class OperationArgumentMapperTest extends TestCase
             $input->query,
         );
     }
+
+    public function testDateTimeArgumentsAreConvertedToTheStoredUtcFormat(): void
+    {
+        $operation = (new OperationCompiler())->compile(ArticlesController::class)[0];
+        $input     = (new OperationArgumentMapper())->map(
+            $operation,
+            ['modified_start' => '2026-01-17T22:00:00+05:00'],
+        );
+
+        self::assertSame(['filter[modified_start]' => '2026-01-17 17:00:00'], $input->query);
+    }
+
+    public function testDateTimeArgumentsWithoutAnOffsetAreReadAsUtc(): void
+    {
+        $operation = (new OperationCompiler())->compile(ArticlesController::class)[0];
+        $input     = (new OperationArgumentMapper())->map(
+            $operation,
+            ['modified_end' => '2026-01-17T22:00:00'],
+        );
+
+        self::assertSame(['filter[modified_end]' => '2026-01-17 22:00:00'], $input->query);
+    }
+
+    public function testDateTimeObjectsAreAccepted(): void
+    {
+        $operation = (new OperationCompiler())->compile(ArticlesController::class)[0];
+        $input     = (new OperationArgumentMapper())->map(
+            $operation,
+            ['modified_start' => new \DateTimeImmutable('2026-01-17 22:00:00', new \DateTimeZone('+05:00'))],
+        );
+
+        self::assertSame(['filter[modified_start]' => '2026-01-17 17:00:00'], $input->query);
+    }
+
+    public function testNonDateTimeArgumentsAreNotReformatted(): void
+    {
+        $operation = (new OperationCompiler())->compile(ArticlesController::class)[0];
+        $input     = (new OperationArgumentMapper())->map(
+            $operation,
+            ['search' => '2026-01-17T22:00:00+05:00'],
+        );
+
+        self::assertSame(['filter[search]' => '2026-01-17T22:00:00+05:00'], $input->query);
+    }
+
+    public function testAnUnusableDateTimeArgumentIsRejected(): void
+    {
+        $operation = (new OperationCompiler())->compile(ArticlesController::class)[0];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('modified_start');
+
+        (new OperationArgumentMapper())->map($operation, ['modified_start' => 'last friday-ish']);
+    }
 }
