@@ -30,15 +30,6 @@ interface PromptInterface
     public function getName(): string;
 
     /**
-     * Get the prompt URI
-     *
-     * @return  string
-     *
-     * @since   __DEPLOY_VERSION__
-     */
-    public function getUri(): string;
-
-    /**
      * Get the prompt description
      *
      * @return  string

@@ -31,8 +31,6 @@ use Mcp\Server\Transport\Http\FileSessionStore;
 use Mcp\Server\Transport\Http\HttpMessage;
 use Mcp\Types\CallToolResult;
 use Mcp\Types\ReadResourceResult;
-use Mcp\Types\TextContent;
-use Mcp\Types\TextResourceContents;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -266,13 +264,17 @@ class McpEndpoint
      */
     private function toCallToolResult(ToolResult $result): CallToolResult
     {
-        $content = [];
+        $data = [
+            'content' => $result->getContent(),
+            'isError' => $result->isError(),
+        ];
 
-        foreach ($result->getContent() as $item) {
-            $content[] = new TextContent($item['text']);
+        // Omit the key entirely when unset: the SDK distinguishes absent from explicit null
+        if ($result->getStructuredContent() !== null) {
+            $data['structuredContent'] = $result->getStructuredContent();
         }
 
-        return new CallToolResult($content, $result->isError());
+        return CallToolResult::fromResponseData($data);
     }
 
     /**
@@ -286,17 +288,7 @@ class McpEndpoint
      */
     private function toReadResourceResult(ResourceResult $result): ReadResourceResult
     {
-        $contents = [];
-
-        foreach ($result->getContents() as $item) {
-            $contents[] = new TextResourceContents(
-                uri: $item['uri'],
-                text: $item['text'],
-                mimeType: $item['mimeType'],
-            );
-        }
-
-        return new ReadResourceResult(contents: $contents);
+        return ReadResourceResult::fromResponseData(['contents' => $result->getContents()]);
     }
 
     /**
