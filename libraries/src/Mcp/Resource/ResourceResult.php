@@ -10,7 +10,9 @@
 namespace Joomla\CMS\Mcp\Resource;
 
 // phpcs:disable PSR1.Files.SideEffects
-\defined('_JEXEC') or die;
+use function defined;
+
+defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**
@@ -21,7 +23,7 @@ namespace Joomla\CMS\Mcp\Resource;
  *
  * @since  __DEPLOY_VERSION__
  */
-final class ResourceResult
+final readonly class ResourceResult
 {
     /**
      * Constructor.
@@ -30,7 +32,7 @@ final class ResourceResult
      *
      * @since  __DEPLOY_VERSION__
      */
-    private function __construct(private readonly array $contents)
+    private function __construct(private array $contents)
     {
     }
 

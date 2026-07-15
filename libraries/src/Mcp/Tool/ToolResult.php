@@ -21,14 +21,14 @@ namespace Joomla\CMS\Mcp\Tool;
  *
  * @since  __DEPLOY_VERSION__
  */
-final class ToolResult
+final readonly class ToolResult
 {
     /**
      * Content type for plain text items
      *
      * @since  __DEPLOY_VERSION__
      */
-    public const TYPE_TEXT = 'text';
+    public const string TYPE_TEXT = 'text';
 
     /**
      * Constructor.
@@ -39,8 +39,8 @@ final class ToolResult
      * @since  __DEPLOY_VERSION__
      */
     private function __construct(
-        private readonly array $content,
-        private readonly bool $error
+        private array $content,
+        private bool $error
     ) {
     }
 
