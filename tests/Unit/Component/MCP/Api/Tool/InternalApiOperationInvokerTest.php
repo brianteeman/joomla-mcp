@@ -10,16 +10,16 @@
 
 namespace Joomla\Tests\Unit\Components\ComMcp\Api\Tool;
 
+use Joomla\CMS\Mcp\Tool\InternalApiOperationInvoker;
 use Joomla\CMS\WebService\Internal\InternalApiDispatcherInterface;
 use Joomla\CMS\WebService\Internal\InternalApiResponse;
 use Joomla\CMS\WebService\Operation\OperationArgumentMapper;
 use Joomla\CMS\WebService\Operation\OperationDefinition;
 use Joomla\CMS\WebService\Operation\OperationInput;
-use Joomla\Component\MCP\Api\Tool\InternalApiOperationInvoker;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Joomla\Component\MCP\Api\Tool\InternalApiOperationInvoker
+ * @covers \Joomla\CMS\Mcp\Tool\InternalApiOperationInvoker
  */
 final class InternalApiOperationInvokerTest extends TestCase
 {

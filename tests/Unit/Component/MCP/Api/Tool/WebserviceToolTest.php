@@ -2,11 +2,11 @@
 
 namespace Joomla\Tests\Unit\Component\MCP\Api\Tool;
 
+use Joomla\CMS\Mcp\Tool\OperationInvokerInterface;
+use Joomla\CMS\Mcp\Tool\OperationResult;
+use Joomla\CMS\Mcp\Tool\WebserviceTool;
 use Joomla\CMS\WebService\Operation\OperationCompiler;
 use Joomla\Component\Content\Api\Controller\ArticlesController;
-use Joomla\Component\MCP\Api\Tool\OperationInvokerInterface;
-use Joomla\Component\MCP\Api\Tool\OperationResult;
-use Joomla\Component\MCP\Api\Tool\WebserviceTool;
 use PHPUnit\Framework\TestCase;
 
 final class WebserviceToolTest extends TestCase
@@ -56,8 +56,8 @@ final class WebserviceToolTest extends TestCase
         $rows   = [['id' => 1], ['id' => 2]];
         $result = $this->tool(0, new OperationResult(200, $rows))->execute([]);
 
-        self::assertFalse($result->isError);
-        self::assertSame(['items' => $rows], $result->structuredContent);
+        self::assertFalse($result->isError());
+        self::assertSame(['items' => $rows], $result->getStructuredContent());
     }
 
     public function testASingleResourceIsReportedAsIs(): void
@@ -65,14 +65,14 @@ final class WebserviceToolTest extends TestCase
         $article = ['id' => 7, 'title' => 'Example'];
         $result  = $this->tool(1, new OperationResult(200, $article))->execute([]);
 
-        self::assertSame($article, $result->structuredContent);
+        self::assertSame($article, $result->getStructuredContent());
     }
 
     public function testAFailedCallReportsNoStructuredContent(): void
     {
         $result = $this->tool(0, new OperationResult(500, ['errors' => [['title' => 'Boom']]]))->execute([]);
 
-        self::assertTrue($result->isError);
-        self::assertNull($result->structuredContent);
+        self::assertTrue($result->isError());
+        self::assertNull($result->getStructuredContent());
     }
 }

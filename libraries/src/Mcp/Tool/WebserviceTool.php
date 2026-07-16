@@ -1,18 +1,15 @@
 <?php
 
 /**
- * @package     Joomla.API
- * @subpackage  com_mcp
+ * Joomla! Content Management System
  *
- * @copyright   (C) 2026 Open Source Matters, Inc. <https://www.joomla.org>
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright  (C) 2026 Open Source Matters, Inc. <https://www.joomla.org>
+ * @license    GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Joomla\Component\MCP\Api\Tool;
+namespace Joomla\CMS\Mcp\Tool;
 
 use Joomla\CMS\WebService\Operation\OperationDefinition;
-use Mcp\Types\CallToolResult;
-use Mcp\Types\TextContent;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -54,31 +51,27 @@ final class WebserviceTool implements ToolInterface
         return $schema;
     }
 
-    public function execute(array $params): CallToolResult
+    public function execute(array $params): ToolResult
     {
         try {
             $result     = $this->invoker->invoke($this->operation, $params);
             $structured = $this->structuredContent($result);
             $text       = $this->formatBody($structured ?? $result->body, $result->statusCode);
 
-            return new CallToolResult(
-                [new TextContent($text)],
-                !$result->isSuccessful(),
-                null,
-                $structured,
-            );
+            if (!$result->isSuccessful()) {
+                return ToolResult::error($text);
+            }
+
+            return $structured !== null
+                ? ToolResult::structured($structured, $text)
+                : ToolResult::text($text);
         } catch (\Throwable $exception) {
-            return new CallToolResult(
-                [
-                    new TextContent(
-                        \sprintf(
-                            '%s could not be executed: %s',
-                            $this->operation->operationId,
-                            $exception->getMessage(),
-                        ),
-                    ),
-                ],
-                true,
+            return ToolResult::error(
+                \sprintf(
+                    '%s could not be executed: %s',
+                    $this->operation->operationId,
+                    $exception->getMessage(),
+                ),
             );
         }
     }

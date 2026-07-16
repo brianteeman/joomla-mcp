@@ -17,17 +17,29 @@ namespace Joomla\Component\MCP\Api\Core;
 // phpcs:enable PSR1.Files.SideEffects
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Mcp\Resource\ResourceInterface;
+use Joomla\CMS\Mcp\Resource\ResourceResult;
+use Joomla\CMS\Mcp\Resource\ResourceTemplateInterface;
+use Joomla\CMS\Mcp\Tool\ToolInterface;
+use Joomla\CMS\Mcp\Tool\ToolResult;
 use Joomla\CMS\User\CurrentUserTrait;
 use Joomla\CMS\User\User;
 use Joomla\Component\MCP\Api\Auth\AuthServiceInterface;
+use Joomla\Component\MCP\Api\Exception\AbilityNotFoundException;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\Stream;
 use Mcp\Server\HttpServerRunner;
+use Mcp\Server\McpServerException;
 use Mcp\Server\Server;
 use Mcp\Server\Transport\Http\BufferedIo;
 use Mcp\Server\Transport\Http\FileSessionStore;
 use Mcp\Server\Transport\Http\HttpMessage;
+use Mcp\Types\CallToolResult;
+use Mcp\Types\ListResourcesResult;
+use Mcp\Types\ListResourceTemplatesResult;
+use Mcp\Types\ListToolsResult;
+use Mcp\Types\ReadResourceResult;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -49,7 +61,7 @@ class McpEndpoint
     /**
      * Constructor.
      *
-     * @param AbilityRegistry $abilityRegistry Tool registry
+     * @param AbilityRegistry $abilityRegistry Ability registry
      * @param array           $config          Configuration. Possible keys:
      *                        - logger: Logger instance, defaults to NullLogger
      *                        - server_name: Server name, defaults to 'Joomla MCP Server'
@@ -133,7 +145,7 @@ class McpEndpoint
             );
 
             // The SDK would normally write status, headers and body directly to PHP's
-            // output (header(), echo). BufferedIo captures those writes in memory so
+            // output (header(), echo). BufferedIo captures the writes in memory so
             // we can return a proper response object to the controller instead.
             $io = new BufferedIo();
 
@@ -183,7 +195,7 @@ class McpEndpoint
      * Register MCP handlers
      *
      * @param Server          $server          Server instance
-     * @param AbilityRegistry $abilityRegistry Tool registry
+     * @param AbilityRegistry $abilityRegistry Ability registry
      *
      * @return  void
      *
@@ -193,20 +205,7 @@ class McpEndpoint
     {
         // Register tool/list handler
         $server->registerHandler('tools/list', function () use ($abilityRegistry) {
-            $tools = [];
-
-            foreach ($abilityRegistry->getTools() as $tool) {
-                $schema = $tool->getSchema();
-
-                $toolDefinition = [
-                    'name' => $tool->getName(),
-                    ...$schema,  // Spread the entire schema (description, inputSchema, annotations)
-                ];
-
-                $tools[] = $toolDefinition;
-            }
-
-            return ['tools' => $tools];
+            return $this->toListToolsResult($abilityRegistry->getTools());
         });
 
         // Register tool/call handler
@@ -214,42 +213,154 @@ class McpEndpoint
             $toolName  = $params->name;
             $arguments = $params->arguments;
 
-            $tool = $abilityRegistry->getTool($toolName);
-
-            if (!$tool) {
-                throw new \InvalidArgumentException('Tool not found: ' . $toolName, 404);
+            try {
+                $tool = $abilityRegistry->getTool($toolName);
+            } catch (AbilityNotFoundException) {
+                throw McpServerException::unknownTool($toolName);
             }
 
-            return $tool->execute($arguments);
+            return $this->toCallToolResult($tool->execute($arguments));
         });
 
         // Register resources/list handler
         $server->registerHandler('resources/list', function () use ($abilityRegistry) {
-            $resources = [];
-
-            foreach ($abilityRegistry->getResources() as $resource) {
-                $resources[] = [
-                    "uri"         => $resource->getUri(),
-                    "name"        => $resource->getName(),
-                    "title"       => $resource->getTitle(),
-                    "description" => $resource->getDescription(),
-                ];
-            }
-
-            return ['resources' => $resources];
+            return $this->toListResourcesResult($abilityRegistry->getResources());
         });
-
 
         // Register resources/read handler
-        $server->registerHandler('resources/read', function ($params) use ($abilityRegistry) {
-            $resource = $abilityRegistry->getResource($params->uri);
-
-            if (!$resource) {
-                throw new \InvalidArgumentException('Resource not found: ' . $params->uri, 404);
+        $server->registerHandler('resources/read', function ($params) use ($server, $abilityRegistry) {
+            try {
+                $resource = $abilityRegistry->getResource($params->uri);
+            } catch (AbilityNotFoundException) {
+                $modern = $server->getSession()?->clientSupportsFeature('resource_not_found_invalid_params') ?? false;
+                throw McpServerException::unknownResource($params->uri, $modern);
             }
 
-            return $resource->read();
+            return $this->toReadResourceResult($resource->read());
         });
+
+        // Register resources/templates/list handler
+        $server->registerHandler('resources/templates/list', function () use ($abilityRegistry) {
+            return $this->toListResourceTemplatesResult($abilityRegistry->getResourceTemplates());
+        });
+    }
+
+
+    /**
+     * Convert a tool result to the SDK wire format
+     *
+     * @param ToolResult $result The tool result
+     *
+     * @return  CallToolResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private function toCallToolResult(ToolResult $result): CallToolResult
+    {
+        $data = [
+            'content' => array_map(static fn ($item) => $item->toArray(), $result->getContent()),
+            'isError' => $result->isError(),
+        ];
+
+        // Omit the key entirely when unset: the SDK distinguishes absent from explicit null
+        if ($result->getStructuredContent() !== null) {
+            $data['structuredContent'] = $result->getStructuredContent();
+        }
+
+        return CallToolResult::fromResponseData($data);
+    }
+
+    /**
+     * Convert a resource result to the SDK wire format
+     *
+     * @param ResourceResult $result The resource result
+     *
+     * @return  ReadResourceResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private function toReadResourceResult(ResourceResult $result): ReadResourceResult
+    {
+        return ReadResourceResult::fromResponseData(
+            ['contents' => array_map(static fn ($item) => $item->toArray(), $result->getContents())]
+        );
+    }
+
+
+    /**
+     * Convert registered tools to the SDK wire format
+     *
+     * @param ToolInterface[] $tools The registered tools
+     *
+     * @return  ListToolsResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private function toListToolsResult(array $tools): ListToolsResult
+    {
+        $definitions = [];
+
+        foreach ($tools as $tool) {
+            $definitions[] = [
+                'name' => $tool->getName(),
+                // Spread the entire schema (description, inputSchema, annotations)
+                ...$tool->getSchema(),
+            ];
+        }
+
+        return ListToolsResult::fromResponseData(['tools' => $definitions]);
+    }
+
+    /**
+     * Convert registered resources to the SDK wire format
+     *
+     * @param ResourceInterface[] $resources The registered resources
+     *
+     * @return  ListResourcesResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private function toListResourcesResult(array $resources): ListResourcesResult
+    {
+        $definitions = [];
+
+        foreach ($resources as $resource) {
+            $definitions[] = [
+                'uri'         => $resource->getUri(),
+                'name'        => $resource->getName(),
+                'title'       => $resource->getTitle(),
+                'description' => $resource->getDescription(),
+                'mimeType'    => $resource->getMimeType(),
+            ];
+        }
+
+        return ListResourcesResult::fromResponseData(['resources' => $definitions]);
+    }
+
+    /**
+     * Convert registered resource templates to the SDK wire format
+     *
+     * @param ResourceTemplateInterface[] $templates The registered resource templates
+     *
+     * @return  ListResourceTemplatesResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private function toListResourceTemplatesResult(array $templates): ListResourceTemplatesResult
+    {
+        $definitions = [];
+
+        foreach ($templates as $template) {
+            $definitions[] = [
+                'name'        => $template->getName(),
+                'uriTemplate' => $template->getUriTemplate(),
+                'title'       => $template->getTitle(),
+                'description' => $template->getDescription(),
+                'mimeType'    => $template->getMimeType(),
+            ];
+        }
+
+        return ListResourceTemplatesResult::fromResponseData(['resourceTemplates' => $definitions]);
     }
 
     /**
@@ -271,7 +382,7 @@ class McpEndpoint
         }
 
         /**
-         * Apache specific fix: mod_php does not expose the Authorization header in the
+         * Apache-specific fix: mod_php does not expose the Authorization header in the
          * environment, only via apache_request_headers().
          * See https://github.com/symfony/symfony/issues/19693 and the same handling in
          * plg_api-authentication_token.
@@ -280,14 +391,14 @@ class McpEndpoint
             empty($authHeader) && \PHP_SAPI === 'apache2handler'
             && \function_exists('apache_request_headers') && apache_request_headers() !== false
         ) {
-            $apacheHeaders = array_change_key_case(apache_request_headers(), CASE_LOWER);
+            $apacheHeaders = array_change_key_case(apache_request_headers());
 
             if (\array_key_exists('authorization', $apacheHeaders)) {
                 $authHeader = $apacheHeaders['authorization'];
             }
         }
 
-        // Another Apache specific fix (mod_rewrite/CGI setups pass the header only as
+        // Another Apache-specific fix (mod_rewrite/CGI setups pass the header only as
         // REDIRECT_HTTP_AUTHORIZATION). See https://github.com/symfony/symfony/issues/1813
         if (empty($authHeader)) {
             $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
@@ -304,7 +415,7 @@ class McpEndpoint
     }
 
     /**
-     * Create unauthorized response
+     * Create an unauthorized response
      *
      * @param string $message Error message
      *

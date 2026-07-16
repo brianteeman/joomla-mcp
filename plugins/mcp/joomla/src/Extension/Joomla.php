@@ -10,12 +10,12 @@
 
 namespace Joomla\Plugin\Mcp\Joomla\Extension;
 
+use Joomla\CMS\Mcp\Tool\InternalApiOperationInvoker;
+use Joomla\CMS\Mcp\Tool\WebserviceToolProvider;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\CMS\WebService\Operation\OperationCompiler;
 use Joomla\Component\Content\Api\Controller\ArticlesController;
 use Joomla\Component\MCP\Administrator\Event\InitialiseMCPServerEvent;
-use Joomla\Component\MCP\Api\Tool\InternalApiOperationInvoker;
-use Joomla\Component\MCP\Api\Tool\WebserviceToolProvider;
 use Joomla\Event\SubscriberInterface;
 use Joomla\Plugin\Mcp\Joomla\Resource\ApplicationConfig;
 use Joomla\Plugin\Mcp\Joomla\Resource\SysInfo;
