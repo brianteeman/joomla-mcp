@@ -27,6 +27,8 @@ final class ArticleListQuery
     #[Description('Only articles in this category identifier. The category is addressed as catid on the article itself.')]
     public ?int $category = null;
 
+    // Deliberately stricter than the webservices, which accept any integer: the enum documents the four valid
+    // publication states so an out-of-range value is rejected by the contract rather than silently ignored.
     #[Description('Only articles in this publication state: 1 published, 0 unpublished, 2 archived or -2 trashed. Omit to use the default, which returns published and unpublished articles.')]
     #[Example(1)]
     public ?ArticleState $state = null;
@@ -50,6 +52,8 @@ final class ArticleListQuery
     #[Example('content:release notes')]
     public ?string $search = null;
 
+    // Deliberately typed as date-time rather than the webservices' plain string: the mapper normalises the value to
+    // Joomla's stored UTC format, so an explicit timezone offset is honoured instead of silently truncated.
     #[Description('Only articles modified at or after this moment.')]
     public ?\DateTimeImmutable $modified_start = null;
 
