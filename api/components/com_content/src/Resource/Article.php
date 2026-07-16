@@ -112,7 +112,11 @@ final class Article extends Resource
     #[Description('When the article stops being published. Null never expires it.')]
     public ?\DateTimeImmutable $publish_down = null;
 
-    #[Guarded]
+    // The administrator lets the creation date be set, so it is writable on create; omitted, Joomla uses the current
+    // time. It is not editable afterwards, so it stays out of the update schema.
+    #[Description('The creation date and time. Defaults to the current time when omitted.')]
+    #[Optional([ResourceProfile::CREATE])]
+    #[Hidden([ResourceProfile::UPDATE])]
     public \DateTimeImmutable $created;
 
     #[Description('The creating user identifier. A value of 0 uses the current user.')]

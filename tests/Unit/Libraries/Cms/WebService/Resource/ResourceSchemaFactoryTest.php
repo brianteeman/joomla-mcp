@@ -57,6 +57,20 @@ final class ResourceSchemaFactoryTest extends TestCase
         self::assertArrayNotHasKey('articletext', $schema['properties']);
     }
 
+    public function testCreationDateIsSettableOnCreateButNotOnUpdate(): void
+    {
+        $factory = new ResourceSchemaFactory();
+
+        // The administrator lets the creation date be set, so create exposes it without demanding it.
+        $create = $factory->create(Article::class, ResourceProfile::CREATE);
+        self::assertArrayHasKey('created', $create['properties']);
+        self::assertNotContains('created', $create['required'] ?? []);
+
+        // It is not editable afterwards, so it stays out of the update schema.
+        $update = $factory->create(Article::class, ResourceProfile::UPDATE);
+        self::assertArrayNotHasKey('created', $update['properties']);
+    }
+
     public function testNestedValueObjectsAreExpandedIntoTheSchema(): void
     {
         $urls = (new ResourceSchemaFactory())
