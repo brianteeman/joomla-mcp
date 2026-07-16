@@ -220,8 +220,6 @@ class McpEndpoint
             try {
                 $tool = $abilityRegistry->getTool($toolName);
             } catch (AbilityNotFoundException) {
-                // Translate the domain exception into JSON-RPC error -32602 (invalid
-                // params); anything else would surface as -32603 internal error
                 throw McpServerException::unknownTool($toolName);
             }
 
@@ -246,11 +244,12 @@ class McpEndpoint
 
 
         // Register resources/read handler
-        $server->registerHandler('resources/read', function ($params) use ($abilityRegistry) {
+        $server->registerHandler('resources/read', function ($params) use ($server, $abilityRegistry) {
             try {
                 $resource = $abilityRegistry->getResource($params->uri);
             } catch (AbilityNotFoundException) {
-                throw McpServerException::unknownResource($params->uri);
+                $modern = $server->getSession()?->clientSupportsFeature('resource_not_found_invalid_params') ?? false;
+                throw McpServerException::unknownResource($params->uri, $modern);
             }
 
             return $this->toReadResourceResult($resource->read());
