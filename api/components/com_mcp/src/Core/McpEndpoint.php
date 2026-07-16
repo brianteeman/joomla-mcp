@@ -242,6 +242,48 @@ class McpEndpoint
         });
     }
 
+
+    /**
+     * Convert a tool result to the SDK wire format
+     *
+     * @param ToolResult $result The tool result
+     *
+     * @return  CallToolResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private function toCallToolResult(ToolResult $result): CallToolResult
+    {
+        $data = [
+            'content' => array_map(static fn ($item) => $item->toArray(), $result->getContent()),
+            'isError' => $result->isError(),
+        ];
+
+        // Omit the key entirely when unset: the SDK distinguishes absent from explicit null
+        if ($result->getStructuredContent() !== null) {
+            $data['structuredContent'] = $result->getStructuredContent();
+        }
+
+        return CallToolResult::fromResponseData($data);
+    }
+
+    /**
+     * Convert a resource result to the SDK wire format
+     *
+     * @param ResourceResult $result The resource result
+     *
+     * @return  ReadResourceResult
+     *
+     * @since   __DEPLOY_VERSION__
+     */
+    private function toReadResourceResult(ResourceResult $result): ReadResourceResult
+    {
+        return ReadResourceResult::fromResponseData(
+            ['contents' => array_map(static fn ($item) => $item->toArray(), $result->getContents())]
+        );
+    }
+
+
     /**
      * Convert registered tools to the SDK wire format
      *
@@ -316,46 +358,6 @@ class McpEndpoint
         }
 
         return ListResourceTemplatesResult::fromResponseData(['resourceTemplates' => $definitions]);
-    }
-
-    /**
-     * Convert a tool result to the SDK wire format
-     *
-     * @param ToolResult $result The tool result
-     *
-     * @return  CallToolResult
-     *
-     * @since   __DEPLOY_VERSION__
-     */
-    private function toCallToolResult(ToolResult $result): CallToolResult
-    {
-        $data = [
-            'content' => array_map(static fn ($item) => $item->toArray(), $result->getContent()),
-            'isError' => $result->isError(),
-        ];
-
-        // Omit the key entirely when unset: the SDK distinguishes absent from explicit null
-        if ($result->getStructuredContent() !== null) {
-            $data['structuredContent'] = $result->getStructuredContent();
-        }
-
-        return CallToolResult::fromResponseData($data);
-    }
-
-    /**
-     * Convert a resource result to the SDK wire format
-     *
-     * @param ResourceResult $result The resource result
-     *
-     * @return  ReadResourceResult
-     *
-     * @since   __DEPLOY_VERSION__
-     */
-    private function toReadResourceResult(ResourceResult $result): ReadResourceResult
-    {
-        return ReadResourceResult::fromResponseData(
-            ['contents' => array_map(static fn ($item) => $item->toArray(), $result->getContents())]
-        );
     }
 
     /**
