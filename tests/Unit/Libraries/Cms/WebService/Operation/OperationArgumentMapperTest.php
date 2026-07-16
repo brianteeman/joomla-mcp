@@ -22,6 +22,34 @@ final class OperationArgumentMapperTest extends TestCase
         self::assertSame(['title' => 'Changed title'], $input->body);
     }
 
+    public function testCreateFillsOmittedFieldsWithTheirDefaults(): void
+    {
+        // A create behaves like the administrator form: the body is optional and omitted fields fall back to their
+        // declared defaults, so a caller can create an article from a title and category alone.
+        $operation = (new OperationCompiler())->compile(ArticlesController::class)[2];
+        $input     = (new OperationArgumentMapper())->map(
+            $operation,
+            ['title' => 'Minimal', 'catid' => 2],
+        );
+
+        self::assertSame('Minimal', $input->body['title']);
+        self::assertSame(2, $input->body['catid']);
+        self::assertSame('', $input->body['articletext']);
+        self::assertSame('*', $input->body['language']);
+    }
+
+    public function testUpdateDoesNotInventOmittedFields(): void
+    {
+        // A partial update must not fill defaults, or it would overwrite unspecified fields on every patch.
+        $operation = (new OperationCompiler())->compile(ArticlesController::class)[3];
+        $input     = (new OperationArgumentMapper())->map(
+            $operation,
+            ['id' => 7, 'title' => 'Changed'],
+        );
+
+        self::assertSame(['title' => 'Changed'], $input->body);
+    }
+
     public function testListArgumentsUseJoomlaQueryParameterNames(): void
     {
         $operation = (new OperationCompiler())->compile(ArticlesController::class)[0];

@@ -48,12 +48,19 @@ final class OperationArgumentMapper
             }
         }
 
+        // A create sends every field, defaulting the ones the caller omitted, the way the administrator form does; a
+        // partial update sends only what the caller supplied.
+        $applyDefaults = $operation->method === 'POST';
+
         foreach ($operation->requestBodySchema['properties'] ?? [] as $name => $schema) {
-            if (!\array_key_exists($name, $arguments)) {
+            if (\array_key_exists($name, $arguments)) {
+                $body[$name] = $this->transportValue($arguments[$name], $schema, $name);
                 continue;
             }
 
-            $body[$name] = $this->transportValue($arguments[$name], $schema, $name);
+            if ($applyDefaults && \array_key_exists('default', $schema)) {
+                $body[$name] = $schema['default'];
+            }
         }
 
         return new OperationInput($path, $query, $body);
