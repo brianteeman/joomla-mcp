@@ -36,6 +36,17 @@ final class OperationCompilerTest extends TestCase
         self::assertArrayNotHasKey('author', $list->queryParameters);
     }
 
+    public function testEveryListParameterIsOptional(): void
+    {
+        // The webservices controller reads every list parameter conditionally, so none is mandatory. Ordering and
+        // direction must not be required either, even though they carry a default.
+        $list = (new OperationCompiler())->compile(ArticlesController::class)[0];
+
+        self::assertArrayHasKey('ordering', $list->inputSchema['properties']);
+        self::assertArrayHasKey('direction', $list->inputSchema['properties']);
+        self::assertSame([], $list->inputSchema['required'] ?? []);
+    }
+
     public function testPaginationIsAddedGenericallyRatherThanByTheQueryDto(): void
     {
         // Pagination is a framework concern the compiler adds to every list operation, so it appears in the tool

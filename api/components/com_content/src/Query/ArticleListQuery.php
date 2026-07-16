@@ -70,8 +70,8 @@ final class ArticleListQuery
         . 'category_id, level or tag.'
     )]
     #[Example('created')]
-    public string $ordering = 'id';
+    public ?string $ordering = 'id';
 
     #[Description('The ordering direction. Accepts: asc, desc.')]
-    public string $direction = 'asc';
+    public ?string $direction = 'asc';
 }
