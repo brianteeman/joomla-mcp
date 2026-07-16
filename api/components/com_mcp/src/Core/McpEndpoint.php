@@ -32,6 +32,9 @@ use Mcp\Server\Transport\Http\BufferedIo;
 use Mcp\Server\Transport\Http\FileSessionStore;
 use Mcp\Server\Transport\Http\HttpMessage;
 use Mcp\Types\CallToolResult;
+use Mcp\Types\ListResourcesResult;
+use Mcp\Types\ListResourceTemplatesResult;
+use Mcp\Types\ListToolsResult;
 use Mcp\Types\ReadResourceResult;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
@@ -209,7 +212,7 @@ class McpEndpoint
                 $tools[] = $toolDefinition;
             }
 
-            return ['tools' => $tools];
+            return ListToolsResult::fromResponseData(['tools' => $tools]);
         });
 
         // Register tool/call handler
@@ -239,7 +242,7 @@ class McpEndpoint
                 ];
             }
 
-            return ['resources' => $resources];
+            return ListResourcesResult::fromResponseData(['resources' => $resources]);
         });
 
 
@@ -253,6 +256,23 @@ class McpEndpoint
             }
 
             return $this->toReadResourceResult($resource->read());
+        });
+
+        // Register resources/templates/list handler
+        $server->registerHandler('resources/templates/list', function () use ($abilityRegistry) {
+            $templates = [];
+
+            foreach ($abilityRegistry->getResourceTemplates() as $template) {
+                $templates[] = [
+                    'name'        => $template->getName(),
+                    'uriTemplate' => $template->getUriTemplate(),
+                    'title'       => $template->getTitle(),
+                    'description' => $template->getDescription(),
+                    'mimeType'    => $template->getMimeType(),
+                ];
+            }
+
+            return ListResourceTemplatesResult::fromResponseData(['resourceTemplates' => $templates]);
         });
     }
 
