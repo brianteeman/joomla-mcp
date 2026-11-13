@@ -1,13 +1,12 @@
 <?php
 
 /**
- * @package         Joomla.API
- * @subpackage      com_mcp
+ * @package     Joomla.API
+ * @subpackage  com_mcp
  *
- * @copyright       (C) 2026 Open Source Matters, Inc. <https://www.joomla.org>
- * @license         GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright   (C) 2026 Open Source Matters, Inc. <https://www.joomla.org>
+ * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
-declare(strict_types=1);
 
 declare(strict_types=1);
 
